@@ -12,6 +12,7 @@ without the password it is unreadable ciphertext. Source price sheets and extrac
 | `template.html` | The page with a `__DATA__` placeholder (no data). |
 | `extract.py` | Reads the price sheets under `Rail Freight` into `rail_prices.csv/json` (local only). |
 | `etd.py`, `prep2.py` | Publish-step scripts: slim the data and add departure dates (ETD). |
+| `IMPORT_CONVENTIONS.md` | How each source file type is read, and the agreed interpretation decisions. Read before importing new files. |
 
 ## Refreshing
 

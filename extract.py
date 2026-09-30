@@ -67,7 +67,9 @@ def load(path):
     key = hashlib.md5((rel + str(os.path.getmtime(path))).encode()).hexdigest()
     cp = os.path.join(CACHE, key + '.json.gz')
     if os.path.exists(cp):
-        return json.load(gzip.open(cp, 'rt', encoding='utf-8'))
+        d = json.load(gzip.open(cp, 'rt', encoding='utf-8'))
+        d['saved'] = saved_time(path)
+        return d
     sheets = []
     if path.lower().endswith('.xlsx'):
         import openpyxl
@@ -97,6 +99,7 @@ def load(path):
     d = {'path': rel, 'mtime': os.path.getmtime(path), 'sheets': sheets}
     os.makedirs(CACHE, exist_ok=True)
     json.dump(d, gzip.open(cp, 'wt', encoding='utf-8'), ensure_ascii=False, default=str)
+    d['saved'] = saved_time(path)
     return d
 
 
@@ -380,6 +383,83 @@ def parse_klh_sheet(sh):
     return out
 
 
+# ---------------------------------------------------------------- file version time
+def saved_time(path):
+    """The workbook's own 'last saved' time (set by Excel/WPS when the sender saved it).
+    .xlsx: docProps/core.xml dcterms:modified; .xls: OLE summary information (needs olefile).
+    Returns an ISO string (UTC) or None."""
+    try:
+        if path.lower().endswith('.xlsx'):
+            import zipfile
+            c = zipfile.ZipFile(path).read('docProps/core.xml').decode('utf-8', 'ignore')
+            m = re.search(r'<dcterms:modified[^>]*>([^<]+)', c)
+            return m.group(1).strip()[:19] + 'Z' if m else None
+        try:
+            import olefile
+        except ImportError:
+            return None
+        md = olefile.OleFileIO(path).get_metadata()
+        t = md.last_saved_time
+        return t.strftime('%Y-%m-%dT%H:%M:%SZ') if t else None
+    except Exception:
+        return None
+
+
+# ---------------------------------------------------------------- capacity notices
+CAP_WORD = r'(?:已无舱位|无舱位|无仓位|暂无舱|售罄|已收齐|已收满|暂已收满|已受理满|受理满|爆仓)'
+CAP_DATE = re.compile(r'(?<![\d.])(\d{1,2})[./](\d{1,2})(?![\d])((?:\s*[/、,，]\s*\d{1,2}(?![.\d]))*)')
+XUN = {'上旬': (1, 10), '中旬': (11, 20), '下旬': (21, 31), '上中旬': (1, 20), '中下旬': (11, 31)}
+
+
+def capacity(texts, months, year=YEAR):
+    """Find capacity notices. Returns (notes, ranges): notes = text snippets for the remarks;
+    ranges = [start, end] ISO date ranges the notice says are sold out (used by the departure-date rule).
+    Only the schedule / price cell (texts[0]) can set sold-out ranges; the remark column only adds notes."""
+    import calendar
+    notes, ranges = [], []
+    def rng(mo, a, b):
+        if 1 <= mo <= 12:
+            last = calendar.monthrange(year, mo)[1]
+            ranges.append([f'{year}-{mo:02d}-{max(1, a):02d}', f'{year}-{mo:02d}-{min(b, last):02d}'])
+    for idx, text in enumerate(texts):
+        t = flat(text)
+        for m in re.finditer(CAP_WORD, t):
+            s = max([t.rfind(c, 0, m.start()) for c in ' ；;。|'] + [-1]) + 1
+            e_ = [i for i in (t.find(c, m.end()) for c in ' ；;。|') if i >= 0]
+            snip = t[max(s, m.start() - 40):min(e_ + [len(t), m.end() + 30])].strip(' ，,')
+            if snip and snip not in notes:
+                notes.append(snip)
+            if idx != 0:
+                continue
+            before = t[max(0, m.start() - 40):m.start()]
+            if '不绕区' in before[-8:]:
+                continue
+            mm = re.search(r'(\d{1,2})月\s*(?:已)?$', before) or re.search(r'(\d{1,2})月[^\d；;]{0,4}$', before)
+            mx = re.search(r'(上中旬|中下旬|上旬|中旬|下旬)\s*均?$', before)
+            md = re.search(r'(\d{1,2})号\s*$', before)
+            mdt = re.search(r'(\d{1,2})\.(\d{1,2})[^\d；;]{0,6}$', before)
+            if mm:
+                rng(int(mm.group(1)), 1, 31)
+            elif mx and months:
+                a, b = XUN[mx.group(1)]; rng(months[0], a, b)
+            elif md and months:
+                d = int(md.group(1)); rng(months[0], d, d)
+            elif mdt:
+                mo, d = int(mdt.group(1)), int(mdt.group(2)); rng(mo, d, d)
+            else:
+                grp = None
+                for g in CAP_DATE.finditer(before):
+                    grp = g
+                if grp and not re.search(r'[；;。]', before[grp.end():]):
+                    mo = int(grp.group(1))
+                    for d in [int(grp.group(2))] + [int(x) for x in re.findall(r'\d{1,2}', grp.group(3))]:
+                        rng(mo, d, d)
+                else:
+                    for mo in months:
+                        rng(mo, 1, 31)
+    return notes, ranges
+
+
 # ---------------------------------------------------------------- main
 def main():
     t0 = time.time()
@@ -415,7 +495,7 @@ def main():
             recs = parse_klh_sheet(sh) if fam == 'KLH' else parse_table_sheet(fam, sh)
             qd = (sheet_date(sh['name']) if fam == 'ZY' else None) or fdate
             for rec in recs:
-                rec.update({'family': fam, 'quote_date': qd, 'file': d['path'], 'file_mtime': d['mtime'],
+                rec.update({'family': fam, 'quote_date': qd, 'file': d['path'], 'file_mtime': d['mtime'], 'file_saved': d.get('saved'),
                             'sheet': sh['name'], 'sheet_hidden': sh['state'] != 'visible',
                             'dep_month': dep_month(b, sh['name'], rec.pop('title'))})
                 raw.append(rec)
@@ -429,9 +509,15 @@ def main():
         groups.setdefault((r['family'], r['dep_month'], r['quote_date']), {}).setdefault(r['file'], []).append(r)
     chosen = []
     for key, byfile in sorted(groups.items(), key=lambda kv: tuple(str(x) for x in kv[0])):
-        best = max(byfile, key=lambda f: ('更新' in os.path.basename(f), byfile[f][0]['file_mtime'], len(byfile[f])))
+        # newest version = latest internal 'last saved' time; Windows file time only as a fallback
+        def vkey(f):
+            r0 = byfile[f][0]
+            st = r0['file_saved'] or datetime.datetime.utcfromtimestamp(r0['file_mtime']).strftime('%Y-%m-%dT%H:%M:%SZ')
+            return (st, '更新' in os.path.basename(f), r0['file_mtime'], len(byfile[f]))
+        best = max(byfile, key=vkey)
         others = sorted(set(byfile) - {best})
-        log.append(f'USE  {key} -> {best}' + (f'   (ignored {len(others)} other version(s))' if others else ''))
+        log.append(f'USE  {key} -> {best} [saved {byfile[best][0]["file_saved"] or "unknown, file time used"}]' +
+                   ''.join(f'\n       ignored {o} [saved {byfile[o][0]["file_saved"] or "unknown"}]' for o in others))
         for r in byfile[best]:
             r['versions_ignored'] = len(others)
             chosen.append(r)
@@ -463,7 +549,7 @@ def main():
                next((x for x in rs if not x['is_reference']), rs[0])
         rec = {x: base[x] for x in ('destination', 'quote_date', 'dep_month', 'origin', 'origin_raw', 'dest_raw', 'box', 'size',
                                     'operator', 'product', 'service', 'port', 'schedule', 'remark', 'price_note',
-                                    'family', 'file', 'sheet', 'sheet_hidden', 'row', 'versions_ignored')}
+                                    'family', 'file', 'file_saved', 'sheet', 'sheet_hidden', 'row', 'versions_ignored')}
         rec['family_label'] = FAMILY_LABEL[rec['family']]
         rec['native_currency'] = base['currency']
         rec['native_amount'] = round(base['amount'], 2)
@@ -506,6 +592,11 @@ def main():
         rec['route'] = f"{rec['origin']} → {rec['destination']}"
         rec['lane_id'] = ' | '.join([rec['origin'], rec['destination'], rec['operator'], rec['product'], ' / '.join(rec['service']) or 'Standard'])
         rec['source_cell'] = f"{rec['sheet']}!R{rec['row']}"
+        mnums = [int(x) for x in re.findall(r'\d+', rec['dep_month'] or '')]
+        mlist = list(range(mnums[0], mnums[-1] + 1)) if mnums else []
+        notes, so = capacity([rec['schedule'] + ' ' + rec['price_note'] + ' ' + rec['dest_raw'], rec['remark']], mlist)
+        rec['capacity_note'] = '; '.join(notes)
+        rec['sold_out'] = so
         out.append(rec)
     out.sort(key=lambda r: (r['quote_date'] or '', r['origin'], r['box'], r['size']))
 
@@ -514,7 +605,7 @@ def main():
     cols = ['quote_date', 'dep_month', 'route', 'lane_id', 'origin', 'destination', 'box', 'size', 'operator', 'product', 'service',
             'native_currency', 'native_amount', 'usd', 'usd_basis', 'rmb', 'all_in_usd', 'all_in_basis', 'cond_usd', 'cond_basis', 'schedule',
             'port', 'dest_raw', 'price_note', 'remark', 'family_label', 'file', 'sheet', 'source_cell',
-            'sheet_hidden', 'versions_ignored']
+            'file_saved', 'sheet_hidden', 'versions_ignored', 'capacity_note']
     with open(os.path.join(HERE, 'rail_prices.csv'), 'w', encoding='utf-8-sig', newline='') as fh:
         w = csv.DictWriter(fh, fieldnames=cols, extrasaction='ignore')
         w.writeheader()

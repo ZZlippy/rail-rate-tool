@@ -49,7 +49,7 @@ h1,h2,h3{margin:0;font-family:Archivo,system-ui,sans-serif;font-weight:700;lette
 button,select,input{font:inherit;color:inherit}
 .mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
 .eyebrow{font-family:Archivo,sans-serif;font-weight:600;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.wrap{max-width:1280px;margin:0 auto;padding-inline:22px}
+.wrap{max-width:1760px;margin:0 auto;padding-inline:28px}
 .masthead{background:var(--surface);border-bottom:1px solid var(--rule)}
 .masthead .wrap{display:flex;flex-wrap:wrap;gap:18px 32px;align-items:flex-end;justify-content:space-between;padding-block:18px 16px}
 .brand h1{font-size:26px;line-height:1.1}
@@ -133,13 +133,28 @@ tbody tr.current td{background:var(--accent-soft)}
 .best{display:block;margin-left:0!important;line-height:1.2;font:600 9.5px Archivo,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--down);margin-left:4px}
 .sw{width:10px;height:10px;border-radius:2px;flex:none;display:inline-block}
 .legend{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:10px}
+.tlwrap{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:20px;align-items:start}
+.pinside{align-self:stretch}
+.pinbox{position:sticky;top:96px;border:1px solid var(--rule);border-radius:8px;background:var(--surface-2);padding:10px 10px 12px;max-height:calc(100vh - 116px);overflow:auto}
+.pinbox h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.pinbox .legend{flex-direction:column;flex-wrap:nowrap;gap:6px;margin:0}
+.pinbox .legend .item{border-radius:6px;align-items:flex-start;padding:5px 4px 5px 8px;line-height:1.35;background:var(--surface)}
+.pinbox .legend .item .sw{flex:none;margin-top:3px}
+.pinbox .legend .item .nm{flex:1;min-width:0;word-break:keep-all;overflow-wrap:anywhere}
+@media (max-width:900px){ .tlwrap{grid-template-columns:minmax(0,1fr)} .pinbox{position:static;max-height:none;background:transparent;border:0;padding:0} .pinbox .legend{flex-direction:row;flex-wrap:wrap} .pinbox .legend .item{border-radius:999px;align-items:center} .pinbox .legend .item .sw{margin-top:0} }
 .legend .item{display:flex;align-items:center;gap:7px;font-size:12.5px;background:var(--surface-2);border:1px solid var(--ring);border-radius:999px;padding:3px 5px 3px 9px}
 .legend .item button{background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 5px;border-radius:50%}
 .legend .item button:hover{color:var(--up)}
-.charts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.charts{display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
 .charttitle{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
 .charttitle h3{font-size:13px;letter-spacing:.02em}
-.cv{position:relative;height:290px}
+.cv{position:relative;height:360px}
+.tipbox{position:absolute;pointer-events:none;z-index:5;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:6px;padding:7px 10px;font-size:12px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.18);width:max-content;max-width:300px}
+.tipbox .h{font-weight:600;margin-bottom:2px}.tipbox .rt{display:flex;gap:6px;align-items:baseline}.tipbox .rt i{flex:none;width:9px;height:9px;border-radius:2px;display:inline-block;transform:translateY(1px)}
+.tipbox .pv{font-family:'IBM Plex Mono',monospace;font-weight:500}.tipbox .hint{color:var(--muted);font-size:11px;margin-top:3px}
+.tipsvg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:4}
+.rcard.flash{outline:2px solid var(--accent);outline-offset:3px}
+.jumpnote{margin:0 0 10px}
 .spark{position:relative}
 .spark svg{display:block;width:100%;height:auto}
 .controls{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;margin-top:10px}
@@ -171,9 +186,9 @@ footer .wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr
 footer h3{font-size:12px;color:var(--ink);letter-spacing:.02em;margin-bottom:2px}
 footer p{margin:0}
 .two{grid-template-columns:minmax(0,2.1fr) minmax(0,1fr)}
-@media (max-width:900px){ .lookup,.two,.charts{grid-template-columns:minmax(0,1fr)} .figure .val{font-size:38px} }
+@media (max-width:900px){ .lookup,.two{grid-template-columns:minmax(0,1fr)} .figure .val{font-size:38px} }
 @media (max-width:700px){ .rail{position:static} }
-@media (max-width:520px){ .wrap{padding-inline:16px} .vital{padding:0 10px} .cv{height:240px} }
+@media (max-width:520px){ .wrap{padding-inline:16px} .vital{padding:0 10px} .cv{height:300px} }
 @media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
 </style>
 <style>
@@ -253,16 +268,20 @@ table.heatt td{vertical-align:middle}
           </header>
           <div class="body">
             <div class="controls" style="margin:0 0 14px">
-              <div class="field"><span class="lab">Departure Period</span><div class="segmented" id="f-range"></div></div>
+              <div class="field"><span class="lab">X-Axis</span><div class="segmented" id="f-xaxis"></div></div>
+              <div class="field"><span class="lab" id="rangeLab">Departure Period</span><div class="segmented" id="f-range"></div></div>
             </div>
+            <div class="tlwrap"><div class="tlmain">
             <div id="chartView">
               <div class="charts">
-                <div><div class="charttitle"><h3>SOC</h3><span class="note">Shipper-owned container</span></div><div class="cv"><canvas id="ch-soc" aria-label="SOC price history"></canvas></div></div>
-                <div><div class="charttitle"><h3>COC</h3><span class="note">Carrier-owned container</span></div><div class="cv"><canvas id="ch-coc" aria-label="COC price history"></canvas></div></div>
+                <div><div class="charttitle"><h3>SOC</h3></div><div class="cv"><canvas id="ch-soc" aria-label="SOC price history"></canvas></div></div>
+                <div><div class="charttitle"><h3>COC</h3></div><div class="cv"><canvas id="ch-coc" aria-label="COC price history"></canvas></div></div>
               </div>
             </div>
             <div id="tableView" class="scroll" hidden></div>
-            <div class="legend" id="legend"></div>
+            </div>
+            <aside class="pinside" aria-label="Pinned routes"><div class="pinbox"><h3 id="pinHead">Pinned Routes</h3><div class="legend" id="legend"></div></div></aside>
+            </div>
             <p class="note" id="chartNote" style="margin:8px 0 0"></p>
           </div>
         </div>
@@ -309,11 +328,12 @@ table.heatt td{vertical-align:middle}
 <footer>
   <div class="wrap">
     <div><h3>Sources</h3><p>欧洲自营价格表 (中欧报价表), 欧洲非自营价格表, 成都（城厢站）欧线与重庆非自营, and NEP跨里海报价表. The 东南亚 sheets are excluded. No Jiangxi origin has a Budapest price, so Wuhan and Changsha are the nearest origins to Yichun.</p></div>
-    <div><h3>Versions</h3><p>Each quote date uses one file: the 更新 copy first, otherwise the most recently saved copy. The price list shows how many other copies were ignored.</p></div>
+    <div><h3>Versions</h3><p>Each quote date uses one file: the copy with the latest internal last-saved time (from the file's own properties, not the download time). The price list shows how many other copies were ignored.</p></div>
+    <div><h3>Departure Date Rule</h3><p>Lookup cards and the Departure Date timeline price each departure at the latest quote published on or before it. If a sold-out (舱位) notice for that departure came first, the last price before the notice is used. Capacity notes appear in card and price list remarks only.</p></div>
     <div><h3>Departure Months</h3><p>A price listed for two months, such as 9-10月, counts under both. The menu opens on the latest month in the data.</p></div>
     <div><h3>Base Rate and All-In</h3><p>All-in adds the fees a sheet lists for this destination: the COC box pickup charge in the origin city and any fee marked 不含. The 不绕区 surcharge is added only when ticked under More Filters.</p></div>
     <div><h3>Exchange Rate</h3><p>USD comes from the sheet where given. RMB-only prices use the RMB/USD rate implied by that day's own sheets (about 6.68–6.85 in this period).</p></div>
-    <div><h3>Updating</h3><p>Add the new export folder to Rail Freight, run <span class="mono">_portal/extract.py</span>, then ask Claude to republish. New destinations are added in the script's DESTINATIONS list.</p></div>
+    <div><h3>Updating</h3><p>Add the new export folder to Rail Freight, run <span class="mono">rail-price-tool/extract.py</span>, then ask Claude to republish. New destinations are added in the script's DESTINATIONS list.</p></div>
     <div id="fGen"></div>
   </div>
 </footer>
@@ -350,11 +370,11 @@ const MULTI_DEST = DESTS.length>1;
 
 const S = {section:"route", view:"lookup", origin:null, dest:null, month:null, size:"40HQ", basis:"base", cur:"USD", cond:false,
   prod:new Set(PRODUCTS.filter(p=>p.on).map(p=>p.k)), op:new Set(OPS.map(o=>o.k)),
-  pins:null, boxes:{}, range:"all", table:false, asof:null, laneMode:"origins", q:"", onlyPins:false, listN:100, chgAll:false};
+  pins:null, boxes:{}, range:"all", xaxis:"dep", table:false, asof:null, laneMode:"origins", q:"", onlyPins:false, listN:100, chgAll:false};
 const store={get(){try{return JSON.parse(localStorage.getItem("nep-rail-tracker-v4")||"null")}catch(e){return null}},set(v){try{localStorage.setItem("nep-rail-tracker-v4",JSON.stringify(v))}catch(e){}}};
 const saved=store.get();
-if(saved){ for(const k of ["origin","dest","size","basis","cur","cond","range","view","pins","boxes","laneMode"]) if(saved[k]!==undefined&&saved[k]!==null) S[k]=saved[k]; }
-const persist=()=>store.set({origin:S.origin,dest:S.dest,size:S.size,basis:S.basis,cur:S.cur,cond:S.cond,range:S.range,view:S.view,pins:S.pins,boxes:S.boxes,laneMode:S.laneMode});
+if(saved){ for(const k of ["origin","dest","size","basis","cur","cond","range","xaxis","view","pins","boxes","laneMode"]) if(saved[k]!==undefined&&saved[k]!==null) S[k]=saved[k]; }
+const persist=()=>store.set({origin:S.origin,dest:S.dest,size:S.size,basis:S.basis,cur:S.cur,cond:S.cond,range:S.range,xaxis:S.xaxis,view:S.view,pins:S.pins,boxes:S.boxes,laneMode:S.laneMode});
 if(!ORIGINS.includes(S.origin)) S.origin=ORIGINS.includes("Chengdu (Chengxiang)")?"Chengdu (Chengxiang)":ORIGINS[0];
 if(!DESTS.includes(S.dest)) S.dest=DESTS.includes("Budapest")?"Budapest":DESTS[0];
 
@@ -418,6 +438,7 @@ seg("f-size",[["40HQ","40HQ"],["2x20ft","2×20ft Set"]],"size");
 seg("f-basis",[["base","Base Rate"],["allin","All-In"]],"basis");
 seg("f-cur",[["USD","USD"],["RMB","RMB"]],"cur");
 seg("f-range",[["all","All"],["91","3 Months"],["28","4 Weeks"]],"range",()=>renderTimeline());
+seg("f-xaxis",[["dep","Departure Date"],["pub","Publish Date"]],"xaxis",()=>renderTimeline());
 seg("f-lanemode",[["origins","Every Origin"],["dests","Every Destination"]],"laneMode",()=>{ S.asof=null; railFields(); renderLane(); });
 chipset("f-prod",PRODUCTS,S.prod); chipset("f-op",OPS,S.op);
 function viewToggle(){ seg("viewToggle",[["lookup","Lookup"],["timeline","Timeline"]],"view",()=>renderSection()); }
@@ -463,54 +484,89 @@ function sparkSVG(a,box){
     <text x="${pl}" y="${h-6}" style="fill:var(--muted);font:11px 'IBM Plex Sans',sans-serif">${fmtD(pts[0].d)}</text>
     <text x="${w-pr}" y="${h-6}" text-anchor="end" style="fill:var(--muted);font:11px 'IBM Plex Sans',sans-serif">${fmtD(pts[last].d)}</text></svg>`;
 }
-function routeCard(rt){
-  let box=S.boxes[rt.id]||"SOC"; if(!rt[box].length) box=box==="SOC"?"COC":"SOC";
-  const a=rt[box], cur=a[a.length-1], prev=a.length>1?a[a.length-2]:null;
+/* departure-date rule: for a departure date e, use the latest price published on or before e;
+   if a sold-out notice covering e was published first, use the last price published before that notice */
+function laneRows(lid){ return ROWS.filter(r=>r.lid===lid&&r.sz===S.size&&S.prod.has(r.pr)&&S.op.has(r.op)); }
+function soldNotice(rows,e){ let n=null; rows.forEach(r=>{ if(r.d>e) return; (r.so||[]).forEach(([a,b])=>{ if(e>=a&&e<=b&&(!n||r.d<n)) n=r.d; }); }); return n; }
+function depPick(boxRows,allRows,e){
+  const cands=boxRows.filter(r=>r.d<=e&&(r.etd||[]).some(x=>x[0]===e)); if(!cands.length) return null;
+  const n=soldNotice(allRows,e);
+  let use=n?cands.filter(r=>r.d<n):cands; if(!use.length) use=cands.filter(r=>r.d<=n);
+  if(!use.length) return null;
+  use.sort((a,b)=>a.d.localeCompare(b.d)||b.span-a.span);
+  const r=use[use.length-1]; return {r,n,t:((r.etd||[]).find(x=>x[0]===e)||[])[1]||"assumed",q:use};
+}
+function depGroups(rt){
+  const rows=laneRows(rt.id), M=S.month;
+  const etds=[...new Set(rows.flatMap(r=>(r.etd||[]).map(x=>x[0])).filter(e=>+e.slice(5,7)===M))].sort();
+  const g=new Map();
+  etds.forEach(e=>{ const s=depPick(rows.filter(r=>r.bx==="SOC"),rows,e), c=depPick(rows.filter(r=>r.bx==="COC"),rows,e); if(!s&&!c) return;
+    const k=(s?s.r.cur+s.r.amt:"-")+"|"+(c?c.r.cur+c.r.amt:"-");
+    if(!g.has(k)) g.set(k,{dates:[],SOC:null,COC:null,frozen:[]});
+    const G=g.get(k); G.dates.push({e,t:(s||c).t});
+    [["SOC",s],["COC",c]].forEach(([bx,p])=>{ if(p&&(!G[bx]||p.r.d>G[bx].d)) G[bx]=p.r; if(p&&p.n) G.frozen.push({e,n:p.n,d:p.r.d}); }); });
+  const out=[...g.values()].sort((a,b)=>a.dates[0].e.localeCompare(b.dates[0].e));
+  if(!out.length){ const s=lastOf(rt,"SOC"), c=lastOf(rt,"COC"); if(s||c) out.push({dates:[],SOC:s,COC:c,frozen:[],fallback:true}); }
+  return out;
+}
+function depList(dates){
+  if(!dates.length) return "—";
+  const byT={}; dates.forEach(x=>(byT[x.t]=byT[x.t]||[]).push(x.e));
+  return Object.entries(byT).map(([t,es])=>`${es.map(fmtD).join(", ")}<br><span class="note">${esc(ETD_LABEL[t]||t)}</span>`).join("<br>");
+}
+function routeCard(rt,G,gi,gn){
+  let box=S.boxes[rt.id]||"SOC"; if(!G[box]) box=box==="SOC"?"COC":"SOC";
+  const cur=G[box], hist=rt[box].length?rt[box]:[cur], prev=[...hist].reverse().find(r=>r.d<cur.d)||null;
   const newest=SEL.length?SEL[SEL.length-1].d:cur.d, age=days(cur.d,newest);
-  const btn=bx=>{ const l=lastOf(rt,bx); return `<button type="button" class="boxbtn" data-bx="${bx}" aria-pressed="${box===bx}"${l?"":" disabled"}><div class="t">${bx} · ${esc(S.size==="2x20ft"?"2×20ft":S.size)}</div><div class="v${l?"":" na"}">${l?money(value(l)):"Not Quoted"}</div></button>`; };
+  const btn=bx=>{ const l=G[bx]; return `<button type="button" class="boxbtn" data-bx="${bx}" aria-pressed="${box===bx}"${l?"":" disabled"}><div class="t">${bx} · ${esc(S.size==="2x20ft"?"2×20ft":S.size)}</div><div class="v${l?"":" na"}">${l?money(value(l)):"Not Quoted"}</div></button>`; };
   const p=parts(cur), f=v=>money(toCur(v,cur));
   let bd=`<span>Base rate</span><span>${f(p.base)}</span>`;
   if(S.basis==="allin") bd+=`<span>${esc(cur.aib&&cur.aib!=="no extra fees listed in sheet"?cur.aib.replace(/^\+ /,""):"Listed fees: none in sheet")}</span><span>${p.fees?"+"+f(p.fees):"—"}</span>`;
   if(S.cond) bd+=`<span>${esc(cur.cb||"不绕区: not listed for this route")}</span><span>${p.cond?"+"+f(p.cond):"—"}</span>`;
   bd+=`<span class="tot">${S.basis==="allin"?"All-in":"Total"}</span><span class="tot">${money(value(cur))}</span>`;
   const pinned=isPinned(rt.id);
-  return `<article class="card rcard" data-id="${esc(rt.id)}">
+  const span=G.dates.length?(G.dates.length>1?`${fmtD(G.dates[0].e)} – ${fmtD(G.dates[G.dates.length-1].e)}`:fmtD(G.dates[0].e)):"";
+  const fr=G.frozen.filter((x,i,a)=>a.findIndex(y=>y.n===x.n)===i);
+  const capLines=[cur.cap?`舱位 Capacity (quoted ${fmtD(cur.d)}): ${cur.cap}`:"",...fr.map(x=>`Sold-out notice on ${fmtD(x.n)} covers departures from ${fmtD(x.e)}; those departures are priced from the ${fmtD(x.d)} quote.`)].filter(Boolean);
+  return `<article class="card rcard" data-id="${esc(rt.id)}" data-g="${gi}">
    <div class="quote">
     <div class="cardtop"><div><div class="route-line"><span>${esc(oName(rt.o))}</span><span class="arrow">→</span><span>${esc(dName(rt.ds))}</span></div>
-      <div class="route-sub">${esc(opName(rt.op))} · ${esc(prName(rt.pr))}${svcShort(rt.sv)?" · "+esc(svcShort(rt.sv)):""}</div></div>
+      <div class="route-sub">${esc(opName(rt.op))} · ${esc(prName(rt.pr))}${svcShort(rt.sv)?" · "+esc(svcShort(rt.sv)):""}</div>
+      ${span?`<div class="route-sub"><b>${mName(S.month)} Departures ${esc(span)}</b>${gn>1?` <span class="note">· Price Group ${gi+1} of ${gn}</span>`:""}</div>`:""}</div>
       <button type="button" class="pinit" data-pin="${esc(rt.id)}" aria-pressed="${pinned}">${pinned?"Pinned ✓":"Pin to Timeline"}</button></div>
     <div class="boxrow">${btn("SOC")}${btn("COC")}</div>
     <div class="figure"><span class="val">${money(value(cur))}</span>${deltaChip(cur,prev)}</div>
     <dl class="meta-row">
-      <div class="meta"><dt>Quote Date</dt><dd>${fmtDY(cur.d)}</dd></div>
-      <div class="meta"><dt>Departures</dt><dd>${esc(cur.m||"—")}</dd></div>
+      <div class="meta"><dt>Departures (ETD)</dt><dd>${G.fallback?'<span class="note">No departure dates; latest quote shown</span>':depList(G.dates)}</dd></div>
+      <div class="meta"><dt>Priced From Quote</dt><dd>${fmtDY(cur.d)}<br><span class="note">${esc(cur.m||"")} sheet</span></dd></div>
       <div class="meta"><dt>As Quoted</dt><dd class="mono">${cur.cur==="USD"?"$":"¥"}${Math.round(cur.amt).toLocaleString("en-US")}</dd></div>
-      <div class="meta"><dt>ETD</dt><dd>${esc((cur.etd||[]).filter(e=>+e[0].slice(5,7)===S.month).map(e=>fmtD(e[0])).join(", ")||"—")}<br><span class="note">${esc(ETD_LABEL[cur.et]||"Listed dates plus weekly schedule")}</span></dd></div>
       <div class="meta"><dt>Schedule</dt><dd>${esc(cur.sch||"—")}</dd></div>
       <div class="meta"><dt>Route / Border</dt><dd>${esc(cur.port||"—")}</dd></div>
-      <div class="meta"><dt>Source</dt><dd><span class="mono" style="font-size:12px">${esc(cur.f.split("/").pop())}</span><br><span class="note">${esc(cur.sh)} · row ${cur.r}</span></dd></div>
+      <div class="meta"><dt>Source</dt><dd><span class="mono" style="font-size:12px">${esc(cur.f.split("/").pop())}</span><br><span class="note">${esc(cur.sh)} · row ${cur.r}${cur.fs?` · saved ${esc(cur.fs.slice(0,16).replace("T"," "))} UTC`:""}</span></dd></div>
     </dl>
    </div>
    <div class="side">
-    <h3>Recent Quotes <span class="note" style="font:400 12px 'IBM Plex Sans',sans-serif">${box} · last ${Math.min(a.length,16)}</span></h3>
-    <div class="spark">${sparkSVG(a,box)}</div>
-    ${age>21?`<div class="notice warn"><div><b>Older Quote</b>This route's latest ${box} quote for ${mName(S.month)} departures is ${age} days older than the newest quote in the data.</div></div>`:""}
+    <h3>Recent Quotes <span class="note" style="font:400 12px 'IBM Plex Sans',sans-serif">${box} · ${mName(S.month)} · last ${Math.min(hist.length,16)}</span></h3>
+    <div class="spark">${sparkSVG(hist,box)}</div>
+    ${age>21?`<div class="notice warn"><div><b>Older Quote</b>This price comes from a quote ${age} days older than the newest quote in the data.</div></div>`:""}
     ${(S.basis==="allin"||S.cond)?`<div class="notice info"><div style="width:100%"><b>How the Price Is Built</b><div class="bd">${bd}</div></div></div>`:""}
     ${box==="COC"&&cur.pk?`<div class="notice"><div><b>COC Box Pickup</b>${esc(cur.pk)}</div></div>`:""}
-    ${REM[cur.rk]?`<details class="dt"><summary>Sheet Remark</summary><p>${esc(REM[cur.rk])}</p></details>`:""}
+    ${(REM[cur.rk]||capLines.length)?`<details class="dt"><summary>Sheet Remark</summary><p>${capLines.map(esc).join("<br>")}${capLines.length&&REM[cur.rk]?"<br>":""}${esc(REM[cur.rk]||"")}</p></details>`:""}
     <p class="note" style="margin:0">USD basis: ${esc(cur.ub)}${cur.vi?` · ${cur.vi} other cop${cur.vi>1?"ies":"y"} of this sheet ignored`:""}</p>
    </div></article>`;
 }
+let CARDS=[];
 function renderLookup(){
   const list=routesWhere(x=>x.o===S.origin&&x.ds===S.dest).sort((a,b)=>keyVal(a)-keyVal(b));
-  $("cards").innerHTML=list.length?list.map(routeCard).join("")
+  CARDS=[]; list.forEach(rt=>{ const gs=depGroups(rt); gs.forEach((G,i)=>CARDS.push({rt,G,i,n:gs.length})); });
+  $("cards").innerHTML=CARDS.length?CARDS.map(c=>routeCard(c.rt,c.G,c.i,c.n)).join("")
     :`<div class="card"><div class="body"><p class="empty">No ${esc(oName(S.origin))} → ${esc(dName(S.dest))} prices for ${mName(S.month)} departures with these filters. Try another month or origin, or check More Filters.</p></div></div>`;
-  renderLookupBind(); renderAlts();
+  renderLookupBind(); renderAlts(); applyJump();
 }
 function renderLookupBind(){
   $("cards").querySelectorAll(".rcard").forEach(c=>{ const id=c.dataset.id;
-    c.querySelectorAll(".boxbtn").forEach(b=>b.onclick=()=>{ S.boxes[id]=b.dataset.bx; persist(); const n=document.createElement("div"); n.innerHTML=routeCard(ROUTES.get(id)); c.replaceWith(n.firstElementChild); renderLookupBind(); });
-    const pb=c.querySelector("[data-pin]"); pb.onclick=()=>{ togglePin(id); const on=isPinned(id); pb.setAttribute("aria-pressed",on); pb.textContent=on?"Pinned ✓":"Pin to Timeline"; };
+    c.querySelectorAll(".boxbtn").forEach(b=>b.onclick=()=>{ S.boxes[id]=b.dataset.bx; persist(); renderLookup(); });
+    const pb=c.querySelector("[data-pin]"); pb.onclick=()=>{ togglePin(id); renderLookup(); };
   });
 }
 function renderAlts(){
@@ -525,17 +581,19 @@ function renderAlts(){
     tr.onclick=go; tr.onkeydown=e=>{ if(e.key==="Enter"){e.preventDefault();go();} }; });
 }
 
-/* ---------- timeline: x-axis is the departure date (ETD) ---------- */
+/* ---------- timeline: x-axis is the departure date (ETD) or the publish (quote) date ---------- */
 const charts={};
 const endLabels={id:"endLabels",afterDatasetsDraw(chart){
   const {ctx,chartArea}=chart, items=[];
   chart.data.datasets.forEach((ds,i)=>{ const meta=chart.getDatasetMeta(i); if(meta.hidden||!ds.data.length) return; const el=meta.data[meta.data.length-1]; if(!el) return;
-    items.push({y:el.y,x:el.x,c:ds.borderColor,v:ds.data[ds.data.length-1].y}); });
+    items.push({y:el.y,x:el.x,c:ds.borderColor,v:ds.data[ds.data.length-1].y,pre:ds.pre||""}); });
   items.sort((a,b)=>a.y-b.y);
-  for(let i=1;i<items.length;i++) if(items[i].y-items[i-1].y<14) items[i].y=items[i-1].y+14;
+  const top=6, bot=chart.height-6, sp=Math.min(14,(bot-top)/Math.max(1,items.length-1));
+  for(let i=0;i<items.length;i++){ if(items[i].y<top) items[i].y=top; if(i&&items[i].y-items[i-1].y<sp) items[i].y=items[i-1].y+sp; }
+  for(let i=items.length-1;i>=0;i--){ const lim=i===items.length-1?bot:items[i+1].y-sp; if(items[i].y>lim) items[i].y=lim; }
   ctx.save(); ctx.font="500 11.5px 'IBM Plex Mono',monospace"; ctx.textBaseline="middle";
   items.forEach(it=>{ const x=chartArea.right+8; ctx.fillStyle=it.c; ctx.beginPath(); ctx.arc(x+3,it.y,3.5,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle=css("--ink"); ctx.fillText(money(it.v),x+11,it.y); });
+    ctx.fillStyle=css("--ink"); ctx.fillText((it.pre?it.pre+" ":"")+money(it.v),x+11,it.y); });
   ctx.restore(); }};
 const ETD_LABEL={listed:"Listed ETD",weekly:"From weekly schedule",assumed:"Assumed mid-month ETD"};
 function tlRoutes(){
@@ -547,26 +605,80 @@ function tlRoutes(){
   return S.pins.map(id=>m.get(id)).filter(Boolean);
 }
 function etdPoints(rt,bx){
-  // for each departure date: the latest quote made on or before it (the final price), plus the range of all such quotes
-  const byEtd=new Map();
-  rt.rows.forEach(r=>{ if(r.bx!==bx) return; (r.etd||[]).forEach(([d,t])=>{ if(r.d>d) return; const e=byEtd.get(d)||{d,t,q:[]}; if(t==="listed") e.t="listed"; else if(t==="weekly"&&e.t==="assumed") e.t="weekly"; e.q.push(r); byEtd.set(d,e); }); });
-  return [...byEtd.values()].map(e=>{ e.q.sort((a,b)=>a.d.localeCompare(b.d)||b.span-a.span); const fin=e.q[e.q.length-1], vs=e.q.map(value);
-    return {x:+new Date(e.d),y:value(fin),etd:e.d,t:e.t,r:fin,lo:Math.min(...vs),hi:Math.max(...vs),n:e.q.length}; }).sort((a,b)=>a.x-b.x);
+  // departure-date rule: each ETD priced at the latest quote published on or before it, cut off at a sold-out notice
+  const box=rt.rows.filter(r=>r.bx===bx), etds=[...new Set(box.flatMap(r=>(r.etd||[]).map(x=>x[0])))].sort();
+  return etds.map(e=>{ const k=depPick(box,rt.rows,e); if(!k) return null; const vs=k.q.map(value);
+    let t=k.t; box.forEach(r=>(r.etd||[]).forEach(x=>{ if(x[0]===e){ if(x[1]==="listed") t="listed"; else if(x[1]==="weekly"&&t==="assumed") t="weekly"; } }));
+    return {x:+new Date(e),y:value(k.r),etd:e,t,r:k.r,n:k.q.length,lo:Math.min(...vs),hi:Math.max(...vs),so:k.n}; }).filter(Boolean);
+}
+const DASH=[[],[7,4],[2,3],[12,4,2,4],[4,6]];
+function pubSeries(rt,bx){
+  // publish-date view: one series per departure month; x is the quote date
+  const byM={}; rt.rows.filter(r=>r.bx===bx).forEach(r=>r.ms.forEach(m=>{ const mp=(byM[m]=byM[m]||new Map()), p=mp.get(r.d); if(!p||r.span<p.span) mp.set(r.d,r); }));
+  return Object.keys(byM).map(Number).sort((a,b)=>a-b).map(m=>({m,pts:[...byM[m].values()].sort((a,b)=>a.d.localeCompare(b.d)).map(r=>({x:+new Date(r.d),y:value(r),d:r.d,r,m}))}));
+}
+function tipHTML(chart,dp){
+  const p=dp.raw, ds=chart.data.datasets[dp.datasetIndex], bx=chart.$bx, PUB=S.xaxis==="pub";
+  const L=[]; L.push(`<div class="h">${PUB?"Published "+fmtDY(p.d):"ETD "+fmtDY(p.etd)+" · "+esc(ETD_LABEL[p.t]||p.t)}</div>`);
+  if(PUB) L.push(`<div>${mName(p.m)} Departures</div>`);
+  L.push(`<div class="rt"><i style="background:${ds.borderColor}"></i><span>${esc(ds.label)}</span></div>`);
+  L.push(`<div>${bx} <span class="pv">${money(p.y)}</span></div>`);
+  if(PUB) L.push(`<div>As Listed: ${esc(p.r.m||"—")}</div>`);
+  else { L.push(`<div>Priced From Quote ${fmtD(p.r.d)} (${esc(p.r.m||"")})</div>`);
+    if(p.n>1) L.push(`<div>${Math.abs(p.hi-p.lo)>=1?`${p.n} Quotes: ${money(p.lo)}–${money(p.hi)}`:`${p.n} Quotes, Unchanged`}</div>`); }
+  L.push(`<div class="hint">Double-click to open in Lookup</div>`);
+  return L.join("");
+}
+function extTip(ctx){
+  const {chart,tooltip}=ctx, host=chart.canvas.parentNode;
+  let box=host.querySelector(".tipbox"), svg=host.querySelector(".tipsvg");
+  if(!box){ box=document.createElement("div"); box.className="tipbox"; host.appendChild(box);
+    svg=document.createElementNS("http://www.w3.org/2000/svg","svg"); svg.setAttribute("class","tipsvg"); host.appendChild(svg); }
+  if(!tooltip.opacity||!tooltip.dataPoints||!tooltip.dataPoints.length){ box.style.display="none"; svg.innerHTML=""; return; }
+  const dp=tooltip.dataPoints[0]; box.innerHTML=tipHTML(chart,dp); box.style.display="block";
+  const W=host.clientWidth, H=host.clientHeight, bw=box.offsetWidth, bh=box.offsetHeight, px=dp.element.x, py=dp.element.y, g=46;
+  const right=px<W/2, below=py<H/2;
+  let bxl=right?px+g:px-g-bw, byt=below?py+g*.7:py-g*.7-bh;
+  bxl=Math.max(2,Math.min(W-bw-2,bxl)); byt=Math.max(2,Math.min(H-bh-2,byt));
+  if(bxl<px&&px<bxl+bw&&byt<py&&py<byt+bh) byt=below?py+14:py-14-bh;   // never cover the point
+  box.style.left=bxl+"px"; box.style.top=byt+"px";
+  const ax=right?bxl:bxl+bw, ay=below?byt:byt+bh, c=dp.dataset.borderColor;
+  svg.innerHTML=`<line x1="${px}" y1="${py}" x2="${ax}" y2="${ay}" stroke="${c}" stroke-width="1"/><circle cx="${px}" cy="${py}" r="5" fill="none" stroke="${c}" stroke-width="1.2"/>`;
+}
+function tlJump(chart,evt){
+  const hit=chart.getElementsAtEventForMode(evt,"nearest",{intersect:true},false); if(!hit.length) return;
+  const ds=chart.data.datasets[hit[0].datasetIndex], p=ds.data[hit[0].index], PUB=S.xaxis==="pub", id=ds.rid, x=ROUTES.get(id)||{};
+  S.origin=x.o||p.r.o; S.dest=x.ds||p.r.ds; S.month=PUB?p.m:+p.etd.slice(5,7); S.boxes[id]=chart.$bx; S.view="lookup";
+  S.jump={id,bx:chart.$bx,pub:PUB,etd:p.etd||null,y:p.y,d:p.r.d}; persist(); viewToggle(); renderAll();
+}
+function applyJump(){
+  const J=S.jump; if(!J) return; S.jump=null;
+  let k=CARDS.findIndex(c=>c.rt.id===J.id&&(J.pub?c.G[J.bx]&&Math.abs(value(c.G[J.bx])-J.y)<1:c.G.dates.some(x=>x.e===J.etd)));
+  if(k<0) k=CARDS.findIndex(c=>c.rt.id===J.id); if(k<0) return;
+  const el=$("cards").querySelectorAll(".rcard")[k]; if(!el) return;
+  if(J.pub){ const cur=CARDS[k].G[J.bx], same=cur&&Math.abs(value(cur)-J.y)<1;
+    if(!same){ const n=document.createElement("div"); n.className="notice info jumpnote"; n.innerHTML=`<div>Opened from the ${fmtD(J.d)} quote (${money(J.y)}); current price shown.</div>`; el.querySelector(".quote").prepend(n); } }
+  el.classList.add("flash"); el.scrollIntoView({behavior:"smooth",block:"center"}); setTimeout(()=>el.classList.remove("flash"),2200);
 }
 function renderTimeline(){
   { const ids=laneIds(), b=$("pinCur"), all=ids.length&&ids.every(id=>S.pins.includes(id));
     b.disabled=!ids.length||all; b.textContent=!ids.length?"No Routes for This Lane":all?"✓ All Pinned":"+ Pin Current Route";
     b.title=ids.length?`Pins ${ids.length} route${ids.length>1?"s":""}: ${oName(S.origin)} → ${dName(S.dest)}`:""; }
   const pl=tlRoutes();
-  const pts={}; pl.forEach(x=>{ pts[x.id]={SOC:etdPoints(x,"SOC"),COC:etdPoints(x,"COC")}; });
-  const allX=pl.flatMap(x=>[...pts[x.id].SOC,...pts[x.id].COC].map(p=>p.x));
+  const PUB=S.xaxis==="pub"; $("rangeLab").textContent=PUB?"Publish Period":"Departure Period";
+  const pts={}, pser={}; pl.forEach(x=>{ if(PUB) pser[x.id]={SOC:pubSeries(x,"SOC"),COC:pubSeries(x,"COC")}; else pts[x.id]={SOC:etdPoints(x,"SOC"),COC:etdPoints(x,"COC")}; });
+  const allX=PUB?pl.flatMap(x=>[...pser[x.id].SOC,...pser[x.id].COC].flatMap(s=>s.pts.map(p=>p.x))):pl.flatMap(x=>[...pts[x.id].SOC,...pts[x.id].COC].map(p=>p.x));
   const last=allX.length?Math.max(...allX):Date.now(), first=allX.length?Math.min(...allX):last;
   const from=S.range==="all"?first:last-(+S.range)*864e5;
   $("chartView").hidden=S.table; $("tableView").hidden=!S.table;
   const surf=css("--surface");
   const sets={SOC:[],COC:[]};
-  pl.forEach(x=>["SOC","COC"].forEach(bx=>{ const d=pts[x.id][bx].filter(p=>p.x>=from); if(!d.length) return; const c=css(pinColor(x.id));
-    sets[bx].push({label:x.full,data:d,borderColor:c,backgroundColor:c,borderWidth:2,tension:0,
+  const allM=PUB?[...new Set(pl.flatMap(x=>[...pser[x.id].SOC,...pser[x.id].COC].map(s=>s.m)))].sort((a,b)=>a-b):[];
+  if(PUB) pl.forEach(x=>["SOC","COC"].forEach(bx=>pser[x.id][bx].forEach(sr=>{ const d=sr.pts.filter(p=>p.x>=from); if(!d.length) return; const c=css(pinColor(x.id));
+    sets[bx].push({label:x.full,rid:x.id,pre:sr.m+"月",m:sr.m,data:d,borderColor:c,backgroundColor:c,borderWidth:2,tension:0,borderDash:DASH[allM.indexOf(sr.m)%DASH.length],
+      pointRadius:2.6,pointHoverRadius:6,pointBorderColor:c,pointBackgroundColor:c}); })));
+  else pl.forEach(x=>["SOC","COC"].forEach(bx=>{ const d=pts[x.id][bx].filter(p=>p.x>=from); if(!d.length) return; const c=css(pinColor(x.id));
+    sets[bx].push({label:x.full,rid:x.id,data:d,borderColor:c,backgroundColor:c,borderWidth:2,tension:0,
       pointRadius:d.map(p=>p.t==="assumed"?4:2.6),pointHoverRadius:6,pointBorderColor:c,pointBorderWidth:1.6,
       pointBackgroundColor:d.map(p=>p.t==="assumed"?surf:c)}); }));
   if(!S.table && window.Chart){
@@ -574,26 +686,31 @@ function renderTimeline(){
     const mn=ys.length?Math.min(...ys):0, mx=ys.length?Math.max(...ys):1, pad=(mx-mn)*.08||300;
     const ink=css("--ink"), muted=css("--muted"), grid=css("--grid"), rule=css("--rule");
     ["SOC","COC"].forEach(bx=>{ if(charts[bx]) charts[bx].destroy();
-      charts[bx]=new Chart($(bx==="SOC"?"ch-soc":"ch-coc"),{type:"line",data:{datasets:sets[bx]},plugins:[endLabels],options:{responsive:true,maintainAspectRatio:false,animation:false,layout:{padding:{right:S.cur==="RMB"?92:78}},interaction:{mode:"nearest",intersect:true},
-        plugins:{legend:{display:false},tooltip:{backgroundColor:surf,titleColor:ink,bodyColor:ink,borderColor:rule,borderWidth:1,
-          callbacks:{title:it=>it.length?"ETD "+fmtDY(it[0].raw.etd)+" · "+ETD_LABEL[it[0].raw.t]:"",
-            label:it=>{ const p=it.raw; return `${it.dataset.label}: ${money(p.y)}`; },
-            afterLabel:it=>{ const p=it.raw; return `Quoted ${fmtD(p.r.d)} (${p.r.m})`+(p.n>1&&Math.abs(p.hi-p.lo)>=1?` · ${p.n} quotes, ${money(p.lo)}–${money(p.hi)}`:p.n>1?` · ${p.n} quotes, unchanged`:""); }}}},
-        scales:{x:{type:"linear",min:from,max:last,grid:{color:grid},ticks:{color:muted,maxTicksLimit:8,callback:v=>fmtD(toD(v))},title:{display:true,text:"Departure Date (ETD)",color:muted}},
-          y:{min:Math.floor((mn-pad)/100)*100,max:Math.ceil((mx+pad)/100)*100,grid:{color:grid},ticks:{color:muted,callback:v=>money(v)}}}}}); });
+      charts[bx]=new Chart($(bx==="SOC"?"ch-soc":"ch-coc"),{type:"line",data:{datasets:sets[bx]},options:{responsive:true,maintainAspectRatio:false,animation:false,layout:{padding:{right:8}},interaction:{mode:"nearest",intersect:true},
+        plugins:{legend:{display:false},tooltip:{enabled:false,external:extTip}},
+        scales:{x:{type:"linear",min:from,max:last,grid:{color:grid},ticks:{color:muted,maxTicksLimit:8,callback:v=>fmtD(toD(v))},title:{display:true,text:PUB?"Publish Date (Quote)":"Departure Date (ETD)",color:muted}},
+          y:{min:Math.floor((mn-pad)/100)*100,max:Math.ceil((mx+pad)/100)*100,grid:{color:grid},ticks:{color:muted,callback:v=>money(v)}}}}});
+      charts[bx].$bx=bx; const cv=charts[bx].canvas; cv.ondblclick=e=>tlJump(charts[bx],e); cv.onmouseleave=()=>{ const h=cv.parentNode, t=h.querySelector(".tipbox"), g=h.querySelector(".tipsvg"); if(t) t.style.display="none"; if(g) g.innerHTML=""; }; });
   }
-  const nAssumed=pl.reduce((s,x)=>s+[...pts[x.id].SOC,...pts[x.id].COC].filter(p=>p.x>=from&&p.t==="assumed").length,0);
+  const nAssumed=PUB?0:pl.reduce((s,x)=>s+[...pts[x.id].SOC,...pts[x.id].COC].filter(p=>p.x>=from&&p.t==="assumed").length,0);
   $("chartNote").textContent=(!window.Chart&&!S.table?"The chart library could not load. Switch to Table View to see the numbers. ":"")+
-    (pl.length?`Each point is a departure date, priced at the latest quote made on or before it. Solid dots are ETDs listed in the sheet or taken from its weekly schedule; hollow dots are assumed mid-month ETDs where the sheet gives no date${nAssumed?` (${nAssumed} in view)`:""}. Both charts share one ${S.cur} scale.`:"");
-  if(S.table){
+    (pl.length&&PUB?`Each point is a published quote. One line per route per departure month: the route keeps its colour and each month has its own dash (${allM.map(m=>m+"月").join(", ")}). Hover a point for its price. Both charts share one ${S.cur} scale. Double-click a point to open its Lookup card.`:
+     pl.length?`Each point is a departure date, priced at the latest quote published on or before it, or before a sold-out notice for that date if one came first. Solid dots are ETDs listed in the sheet or taken from its weekly schedule; hollow dots are assumed mid-month ETDs where the sheet gives no date${nAssumed?` (${nAssumed} in view)`:""}. Both charts share one ${S.cur} scale. Double-click a point to open its Lookup card.`:"");
+  if(S.table&&PUB){
+    const cols=[]; pl.forEach(x=>allM.forEach(m=>["SOC","COC"].forEach(bx=>{ const sr=pser[x.id][bx].find(s=>s.m===m); if(sr&&sr.pts.some(p=>p.x>=from)) cols.push({x,m,bx,sr}); })));
+    const ds=[...new Set(cols.flatMap(c=>c.sr.pts.filter(p=>p.x>=from).map(p=>p.d)))].sort().reverse();
+    $("tableView").innerHTML=cols.length?`<table><thead><tr><th>Published</th>${cols.map(c=>`<th class="num"><span class="sw" style="background:var(${pinColor(c.x.id)})"></span> ${esc(c.x.full)}<div class="note">${c.m}月 ${c.bx}</div></th>`).join("")}</tr></thead><tbody>`+
+      ds.map(d=>`<tr><td class="mono">${fmtDY(d)}</td>${cols.map(c=>{ const p=c.sr.pts.find(y=>y.d===d); return `<td class="num">${p?money(p.y):'<span class="note">·</span>'}</td>`; }).join("")}</tr>`).join("")+"</tbody></table>":"";
+  } else if(S.table){
     const ds=[...new Set(pl.flatMap(x=>[...pts[x.id].SOC,...pts[x.id].COC].filter(p=>p.x>=from).map(p=>p.etd)))].sort().reverse();
     const mark=t=>t==="assumed"?'<sup title="Assumed mid-month ETD">*</sup>':t==="weekly"?'<sup title="From weekly schedule">†</sup>':"";
     $("tableView").innerHTML=pl.length?`<table><thead><tr><th>Departure (ETD)</th>${pl.map(x=>`<th class="num" colspan="2"><span class="sw" style="background:var(${pinColor(x.id)})"></span> ${esc(x.full)}</th>`).join("")}</tr><tr><th></th>${pl.map(()=>`<th class="num">SOC</th><th class="num">COC</th>`).join("")}</tr></thead><tbody>`+
-      ds.map(d=>`<tr><td class="mono">${fmtDY(d)}</td>${pl.map(x=>["SOC","COC"].map(bx=>{ const p=pts[x.id][bx].find(y=>y.etd===d); return `<td class="num">${p?money(p.y)+mark(p.t)+`<div class="note">quoted ${fmtD(p.r.d)}</div>`:'<span class="note">·</span>'}</td>`; }).join("")).join("")}</tr>`).join("")+
+      ds.map(d=>`<tr><td class="mono">${fmtDY(d)}</td>${pl.map(x=>["SOC","COC"].map(bx=>{ const p=pts[x.id][bx].find(y=>y.etd===d); return `<td class="num">${p?money(p.y)+mark(p.t)+`<div class="note">quoted ${fmtD(p.r.d)}${p.so?" · sold out "+fmtD(p.so):""}</div>`:'<span class="note">·</span>'}</td>`; }).join("")).join("")}</tr>`).join("")+
       `</tbody></table><p class="note">* Assumed mid-month ETD · † From weekly schedule · no mark: ETD listed in the sheet</p>`:"";
   }
-  $("legend").innerHTML=pl.length?pl.map(x=>`<span class="item"><span class="sw" style="background:var(${pinColor(x.id)})"></span>${esc(x.full)}<button type="button" data-unpin="${esc(x.id)}" aria-label="Unpin ${esc(x.full)}">×</button></span>`).join("")
+  $("legend").innerHTML=pl.length?pl.map(x=>`<span class="item"><span class="sw" style="background:var(${pinColor(x.id)})"></span><span class="nm">${esc(x.full)}</span><button type="button" data-unpin="${esc(x.id)}" aria-label="Unpin ${esc(x.full)}">×</button></span>`).join("")
     :'<span class="note">No routes pinned. Pick an origin and destination above and press + Pin Current Route, or use Pin to Timeline on a Lookup card.</span>';
+  $("pinHead").textContent=`Pinned Routes${pl.length?` (${pl.length})`:""}`;
   $("legend").querySelectorAll("button[data-unpin]").forEach(b=>b.onclick=()=>{ togglePin(b.dataset.unpin); renderTimeline(); });
   // price changes: consecutive quotes for the same route, box and departure month
   const out=[];
@@ -652,7 +769,7 @@ function renderList(){
   $("listBody").innerHTML=`<table><thead><tr><th>Quote</th><th>Route</th><th>Box</th><th class="num">As Quoted</th><th class="num">${S.basis==="allin"?"All-In":"Base Rate"} (${S.cur})</th><th>Source</th></tr></thead><tbody>`+
     rs.slice(0,S.listN).map(r=>`<tr><td class="mono">${r.d}<div class="note">${esc(r.m)}</div></td>
       <td class="rt"><b>${esc(routeLabel(r))}</b>
-        <details class="dt"><summary>Details</summary><p><b>Destination cell:</b> ${esc(r.dest)}<br><b>Schedule:</b> ${esc(r.sch||"—")}<br><b>Route/border:</b> ${esc(r.port||"—")}<br><b>ETD:</b> ${esc((r.etd||[]).map(e=>fmtD(e[0])).join(", "))} (${esc(ETD_LABEL[r.et]||"mixed: listed dates plus weekly schedule")})${r.note?"<br><b>Price note:</b> "+esc(r.note):""}${r.pk?"<br><b>COC pickup:</b> "+esc(r.pk):""}<br><b>Fees:</b> ${esc(r.aib)}${r.cb?"; optional "+esc(r.cb):""}<br><b>USD basis:</b> ${esc(r.ub)}<br><b>Remark:</b> ${esc(REM[r.rk]||"—")}</p></details></td>
+        <details class="dt"><summary>Details</summary><p><b>Destination cell:</b> ${esc(r.dest)}<br><b>Schedule:</b> ${esc(r.sch||"—")}<br><b>Route/border:</b> ${esc(r.port||"—")}<br><b>ETD:</b> ${esc((r.etd||[]).map(e=>fmtD(e[0])).join(", "))} (${esc(ETD_LABEL[r.et]||"mixed: listed dates plus weekly schedule")})${r.note?"<br><b>Price note:</b> "+esc(r.note):""}${r.pk?"<br><b>COC pickup:</b> "+esc(r.pk):""}<br><b>Fees:</b> ${esc(r.aib)}${r.cb?"; optional "+esc(r.cb):""}<br><b>USD basis:</b> ${esc(r.ub)}${r.cap?"<br><b>舱位 Capacity:</b> "+esc(r.cap):""}<br><b>Remark:</b> ${esc(REM[r.rk]||"—")}<br><b>File saved:</b> ${esc(r.fs||"unknown")}</p></details></td>
       <td><b>${r.bx}</b><div class="note">${esc(r.sz)}</div></td>
       <td class="num">${r.cur==="USD"?"$":"¥"}${Math.round(r.amt).toLocaleString("en-US")}</td>
       <td class="num">${money(value(r))}</td>
