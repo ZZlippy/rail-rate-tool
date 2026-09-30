@@ -1,0 +1,684 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Neptune Rail Price Tracker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap">
+<style>
+/* Layout: masthead with vitals, section tabs, one sticky filter rail, then cards — same system as the Box Rate Desk */
+:root{
+  color-scheme:light;
+  --plane:#eaeef0; --surface:#ffffff; --surface-2:#f5f8f9; --surface-3:#eef3f5;
+  --ink:#0f1519; --ink-2:#47545e; --muted:#77858e;
+  --grid:#e4e9ec; --rule:#cdd6db; --ring:rgba(15,21,25,.10);
+  --accent:#1c5cab; --accent-ink:#ffffff; --accent-soft:#e7eff9;
+  --up:#c22e2e; --down:#046a38; --flat:#77858e;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948;
+  --q1:#e8f0fd; --q2:#cde2fb; --q3:#9ec5f4; --q4:#6da7ec; --q5:#3987e5;
+  --qi1:#0f1519; --qi2:#0f1519; --qi3:#0f1519; --qi4:#0f1519; --qi5:#ffffff;
+  --warn-bg:#fdf6e6; --warn-br:#ecd9a6;
+  --shadow:0 1px 2px rgba(15,21,25,.05), 0 8px 24px -16px rgba(15,21,25,.28);
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  color-scheme:dark;
+  --plane:#0b0f12; --surface:#151b20; --surface-2:#1b2228; --surface-3:#222a31;
+  --ink:#eef4f7; --ink-2:#aab7c0; --muted:#77858e;
+  --grid:#222a30; --rule:#2d373e; --ring:rgba(255,255,255,.10);
+  --accent:#6da7ec; --accent-ink:#0b0f12; --accent-soft:#1d2c3d;
+  --up:#f08a84; --down:#4cc46a; --flat:#77858e;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#2e9e2e; --s7:#9085e9; --s8:#e66767;
+  --q1:#16283d; --q2:#12365e; --q3:#104281; --q4:#184f95; --q5:#256abf;
+  --qi1:#eef4f7; --qi2:#eef4f7; --qi3:#eef4f7; --qi4:#eef4f7; --qi5:#eef4f7;
+  --warn-bg:#2b2413; --warn-br:#5a4a22;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --plane:#0b0f12; --surface:#151b20; --surface-2:#1b2228; --surface-3:#222a31;
+  --ink:#eef4f7; --ink-2:#aab7c0; --muted:#77858e;
+  --grid:#222a30; --rule:#2d373e; --ring:rgba(255,255,255,.10);
+  --accent:#6da7ec; --accent-ink:#0b0f12; --accent-soft:#1d2c3d;
+  --up:#f08a84; --down:#4cc46a; --flat:#77858e;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#2e9e2e; --s7:#9085e9; --s8:#e66767;
+  --q1:#16283d; --q2:#12365e; --q3:#104281; --q4:#184f95; --q5:#256abf;
+  --qi1:#eef4f7; --qi2:#eef4f7; --qi3:#eef4f7; --qi4:#eef4f7; --qi5:#eef4f7;
+  --warn-bg:#2b2413; --warn-br:#5a4a22;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--plane);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-family:Archivo,system-ui,sans-serif;font-weight:700;letter-spacing:-.015em;text-wrap:balance}
+button,select,input{font:inherit;color:inherit}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+.eyebrow{font-family:Archivo,sans-serif;font-weight:600;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:22px}
+.masthead{background:var(--surface);border-bottom:1px solid var(--rule)}
+.masthead .wrap{display:flex;flex-wrap:wrap;gap:18px 32px;align-items:flex-end;justify-content:space-between;padding-block:18px 16px}
+.brand h1{font-size:26px;line-height:1.1}
+.brand .eyebrow{display:block;margin-bottom:5px}
+.vitals{display:flex;flex-wrap:wrap;gap:8px 0;margin:0}
+.vital{padding:0 16px;border-left:1px solid var(--grid)}
+.vital:first-child{padding-left:0;border-left:0}
+.vital dt{margin:0 0 2px;font-family:Archivo,sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.vital dd{margin:0;font-size:15px;font-weight:500}
+.sections{background:var(--surface);border-bottom:1px solid var(--rule)}
+.sections .wrap{display:flex;gap:4px;overflow-x:auto}
+.sections button{background:transparent;border:0;border-bottom:2px solid transparent;padding:12px 16px 10px;font-family:Archivo,sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.03em;color:var(--muted);cursor:pointer;white-space:nowrap}
+.sections button:hover{color:var(--ink-2)}
+.sections button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.rail{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface-2);border-bottom:1px solid var(--rule)}
+.rail .wrap{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;padding-block:11px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field>label,.field>.lab{font-family:Archivo,sans-serif;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+select{background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:6px 9px;font-size:13px;max-width:280px;cursor:pointer}
+select:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible,tr:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.segmented{display:flex;border:1px solid var(--rule);border-radius:5px;overflow:hidden;background:var(--surface)}
+.segmented button{border:0;border-left:1px solid var(--rule);background:transparent;padding:6px 11px;font-size:12.5px;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.segmented button:first-child{border-left:0}
+.segmented button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:500}
+.spacer{flex:1 1 auto}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;border:1px solid var(--ring);background:var(--surface-2);white-space:nowrap}
+button.chip{cursor:pointer}
+button.chip:hover{border-color:var(--accent)}
+button.chip[aria-pressed="true"],button.chip[aria-expanded="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.chip.up{color:var(--up)} .chip.down{color:var(--down)} .chip.flat{color:var(--flat)}
+.more{border-top:1px solid var(--rule);background:var(--surface-2)}
+.more .wrap{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:flex-end;padding-block:11px}
+label.check{display:inline-flex;gap:7px;align-items:center;font-size:13px;cursor:pointer}
+main{padding-block:22px 40px}
+.grid{display:grid;gap:16px}
+.card{background:var(--surface);border:1px solid var(--ring);border-radius:8px;box-shadow:var(--shadow);min-width:0}
+.card>header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 12px;padding:13px 16px 0}
+.card>header h2{font-size:13px;letter-spacing:.02em}
+.card .body{padding:12px 16px 16px}
+.note{color:var(--muted);font-size:12px}
+.viewbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.viewbar .segmented button{padding:5px 14px}
+.lookup{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+.quote{padding:18px 20px 20px}
+.route-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;font-size:18px;font-weight:500;line-height:1.25}
+.route-line .arrow{color:var(--accent);font-weight:600}
+.route-sub{color:var(--ink-2);font-size:13px;margin-top:4px}
+.boxrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.boxbtn{flex:1 1 120px;text-align:left;background:var(--surface-2);border:1px solid var(--ring);border-radius:6px;padding:8px 11px;cursor:pointer}
+.boxbtn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.boxbtn .t{font-family:Archivo,sans-serif;font-size:10.5px;letter-spacing:.1em;color:var(--muted);font-weight:600;text-transform:uppercase}
+.boxbtn .v{font-family:"IBM Plex Mono",monospace;font-size:16px;font-variant-numeric:tabular-nums}
+.boxbtn .v.na{color:var(--muted);font-size:13px}
+.figure{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-top:14px}
+.figure .val{font-family:"IBM Plex Mono",monospace;font-size:46px;font-weight:500;line-height:1;letter-spacing:-.02em}
+.figure .val.small{font-size:24px;letter-spacing:0;color:var(--muted)}
+.meta-row{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:16px;padding-top:13px;border-top:1px solid var(--grid)}
+.meta{min-width:110px;max-width:100%}
+.meta dt{font-family:Archivo,sans-serif;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:2px}
+.meta dd{margin:0;font-size:13.5px;overflow-wrap:anywhere}
+.notice{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--ring);background:var(--surface-2);border-radius:6px;padding:8px 11px;margin-top:10px;font-size:12.5px;line-height:1.45}
+.notice b{font-family:Archivo,sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:1px}
+.notice.warn{background:var(--warn-bg);border-color:var(--warn-br)}
+.notice.info{background:var(--accent-soft)}
+.bd{display:grid;grid-template-columns:1fr auto;gap:2px 16px;margin-top:4px}
+.bd span:nth-child(even){font-family:"IBM Plex Mono",monospace;text-align:right}
+.bd .tot{border-top:1px solid var(--rule);padding-top:2px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-family:Archivo,sans-serif;font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:0 8px 6px 0;border-bottom:1px solid var(--rule);white-space:nowrap}
+td{padding:6px 8px 6px 0;border-bottom:1px solid var(--grid);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+tbody tr.clickable{cursor:pointer}
+tbody tr.clickable:hover td{background:var(--surface-2)}
+tbody tr.current td{background:var(--accent-soft)}
+.rt b{font-weight:600}
+.rt .s{color:var(--muted);font-size:12px}
+.dl{font-family:"IBM Plex Mono",monospace;font-size:11.5px;white-space:nowrap}
+.dl.up{color:var(--up)} .dl.down{color:var(--down)} .dl.flat{color:var(--flat)}
+.best{display:block;margin-left:0!important;line-height:1.2;font:600 9.5px Archivo,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--down);margin-left:4px}
+.sw{width:10px;height:10px;border-radius:2px;flex:none;display:inline-block}
+.legend{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:10px}
+.legend .item{display:flex;align-items:center;gap:7px;font-size:12.5px;background:var(--surface-2);border:1px solid var(--ring);border-radius:999px;padding:3px 5px 3px 9px}
+.legend .item button{background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 5px;border-radius:50%}
+.legend .item button:hover{color:var(--up)}
+.charts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.charttitle{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.charttitle h3{font-size:13px;letter-spacing:.02em}
+.cv{position:relative;height:290px}
+.spark{position:relative}
+.spark svg{display:block;width:100%;height:auto}
+.controls{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;margin-top:10px}
+/* lane comparison heat cells */
+td.heat{border-radius:3px;padding:6px 8px;text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.q1{background:var(--q1);color:var(--qi1)} td.q2{background:var(--q2);color:var(--qi2)} td.q3{background:var(--q3);color:var(--qi3)} td.q4{background:var(--q4);color:var(--qi4)} td.q5{background:var(--q5);color:var(--qi5)}
+td.heat .dl{color:inherit;opacity:.85}
+table.heatt{border-collapse:separate;border-spacing:0 2px}
+table.heatt td{border-bottom:0}
+.rampkey{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);margin-top:12px;flex-wrap:wrap}
+.rampkey .steps{display:flex}
+.rampkey .steps i{width:26px;height:10px;display:block}
+.movers{list-style:none;margin:0;padding:0}
+.movers li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--grid);font-size:12.5px}
+.movers li:last-child{border-bottom:0}
+.movers .rt{min-width:0}
+.pinbtn{background:transparent;border:1px solid var(--ring);border-radius:5px;padding:2px 8px;font-size:12px;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.pinbtn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+.searchbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:12px}
+.searchbar input[type=search]{flex:1 1 260px;min-width:0;background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:7px 10px;font-size:13px}
+details.dt summary{cursor:pointer;color:var(--accent);font-size:12px}
+details.dt p{margin:6px 0 0;color:var(--ink-2);font-size:12.5px;max-width:80ch}
+td.src{font-size:12px;color:var(--muted);max-width:250px}
+td.src code{font-family:"IBM Plex Mono",monospace;font-size:11px;overflow-wrap:anywhere}
+.btn{background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:6px 12px;font-size:12.5px;cursor:pointer}
+.empty{padding:18px 0;color:var(--muted)}
+footer{border-top:1px solid var(--rule);background:var(--surface);padding-block:18px 26px}
+footer .wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px 28px;font-size:12px;color:var(--muted)}
+footer h3{font-size:12px;color:var(--ink);letter-spacing:.02em;margin-bottom:2px}
+footer p{margin:0}
+.two{grid-template-columns:minmax(0,2.1fr) minmax(0,1fr)}
+@media (max-width:900px){ .lookup,.two,.charts{grid-template-columns:minmax(0,1fr)} .figure .val{font-size:38px} }
+@media (max-width:700px){ .rail{position:static} }
+@media (max-width:520px){ .wrap{padding-inline:16px} .vital{padding:0 10px} .cv{height:240px} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+<style>
+.cards{display:flex;flex-direction:column;gap:16px}
+.rcard{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:0}
+.rcard .quote{border-right:1px solid var(--grid)}
+.rcard .side{padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.rcard .side h3{font-size:13px;letter-spacing:.02em;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.cardtop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.pinit{background:var(--surface);border:1px solid var(--rule);border-radius:5px;padding:5px 11px;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.pinit:hover{border-color:var(--accent)}
+.pinit[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--ink);font-weight:500}
+.lanehead{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:13px 16px 0}
+.lanehead h2{font-size:15px}
+.lanehead .ctl{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap}
+table.heatt{table-layout:fixed;min-width:680px}
+table.heatt th.num,table.heatt td.heat{text-align:right}
+table.heatt td{vertical-align:middle}
+@media (max-width:900px){ .rcard{grid-template-columns:minmax(0,1fr)} .rcard .quote{border-right:0;border-bottom:1px solid var(--grid)} }
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand"><span class="eyebrow">Neptune Logistics · Rail Freight</span><h1>Rail Price Tracker</h1></div>
+    <dl class="vitals" id="vitals"></dl>
+  </div>
+</header>
+
+<nav class="sections" role="tablist" aria-label="Sections">
+  <div class="wrap">
+    <button role="tab" type="button" id="sec-route" data-s="route" aria-selected="true" aria-controls="p-route">Route Rates</button>
+    <button role="tab" type="button" id="sec-lane" data-s="lane" aria-selected="false" aria-controls="p-lane">Lane Comparison</button>
+    <button role="tab" type="button" id="sec-list" data-s="list" aria-selected="false" aria-controls="p-list">Price List</button>
+  </div>
+</nav>
+
+<div class="rail">
+  <div class="wrap">
+    <div class="field" id="originField"><label for="f-origin">Origin</label><select id="f-origin"></select></div>
+    <div class="field" id="destField"><label for="f-dest">Destination</label><select id="f-dest"></select></div>
+    <div class="field" id="monthField"><label for="f-month">Departure Month</label><select id="f-month"></select></div>
+    <div class="field"><span class="lab">Container</span><div class="segmented" id="f-size"></div></div>
+    <div class="field"><span class="lab">Price</span><div class="segmented" id="f-basis"></div></div>
+    <div class="field"><span class="lab">Currency</span><div class="segmented" id="f-cur"></div></div>
+    <div class="spacer"></div>
+    <div class="field"><span class="lab">&nbsp;</span><button type="button" class="chip" id="moreBtn" aria-expanded="false" aria-controls="morePanel">More Filters</button></div>
+  </div>
+  <div class="more" id="morePanel" hidden>
+    <div class="wrap">
+      <div class="field"><span class="lab">Products</span><div style="display:flex;gap:6px;flex-wrap:wrap" id="f-prod"></div></div>
+      <div class="field"><span class="lab">Operator</span><div style="display:flex;gap:6px;flex-wrap:wrap" id="f-op"></div></div>
+      <div class="field"><span class="lab">Customs Routing</span><label class="check"><input type="checkbox" id="f-cond"> Add 不绕区 surcharge (not routed via the bonded zone)</label></div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section id="p-route" role="tabpanel" aria-labelledby="sec-route">
+    <div class="viewbar">
+      <span class="eyebrow">View</span>
+      <div class="segmented" id="viewToggle"></div>
+      <span class="note" id="viewNote"></span>
+    </div>
+    <div id="v-lookup">
+      <div class="cards" id="cards"></div>
+      <div class="card" style="margin-top:16px"><header><h2 id="altTitle">All Routes</h2><span class="note">Click a route to switch to its origin</span></header><div class="body scroll" id="altBody"></div></div>
+    </div>
+    <div id="v-timeline" hidden>
+      <div class="grid">
+        <div class="card">
+          <header><h2>Rate History</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="chip" id="pinCur" type="button">+ Pin Current Route</button>
+              <button class="chip" id="pinClear" type="button">Clear Pins</button>
+              <button class="chip" id="tableToggle" type="button" aria-pressed="false">Table View</button>
+            </div>
+          </header>
+          <div class="body">
+            <div class="controls" style="margin:0 0 14px">
+              <div class="field"><span class="lab">Departure Period</span><div class="segmented" id="f-range"></div></div>
+            </div>
+            <div id="chartView">
+              <div class="charts">
+                <div><div class="charttitle"><h3>SOC</h3><span class="note">Shipper-owned container</span></div><div class="cv"><canvas id="ch-soc" aria-label="SOC price history"></canvas></div></div>
+                <div><div class="charttitle"><h3>COC</h3><span class="note">Carrier-owned container</span></div><div class="cv"><canvas id="ch-coc" aria-label="COC price history"></canvas></div></div>
+              </div>
+            </div>
+            <div id="tableView" class="scroll" hidden></div>
+            <div class="legend" id="legend"></div>
+            <p class="note" id="chartNote" style="margin:8px 0 0"></p>
+          </div>
+        </div>
+        <div class="card"><header><h2>Price Changes</h2><span class="note" id="chgNote"></span></header><div class="body" id="chgBody"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="p-lane" role="tabpanel" aria-labelledby="sec-lane" hidden>
+    <div class="grid two">
+      <div class="card">
+        <div class="lanehead">
+          <h2 id="laneTitle">Lane Snapshot</h2>
+          <div class="ctl">
+            <div class="segmented" id="f-lanemode"></div>
+            <label class="eyebrow" for="f-asof">As of</label><select id="f-asof"></select>
+          </div>
+        </div>
+        <div class="body">
+          <div class="scroll" id="laneBody"></div>
+          <div class="rampkey" id="rampKey"></div>
+        </div>
+      </div>
+      <div class="grid" style="align-content:start">
+        <div class="card"><header><h2>Lowest Prices</h2></header><div class="body" id="lowBody"></div></div>
+        <div class="card"><header><h2>Recent Movers</h2><span class="note">Last 14 days to the as-of date</span></header><div class="body" id="moversBody"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="p-list" role="tabpanel" aria-labelledby="sec-list" hidden>
+    <div class="card"><div class="body">
+      <div class="searchbar">
+        <input type="search" id="q" placeholder="Search route, file, sheet or remark, e.g. 快线, 0914, Timetable" aria-label="Search prices">
+        <label class="check"><input type="checkbox" id="onlyPins"> Pinned Routes Only</label>
+        <span class="note" id="listCount"></span>
+      </div>
+      <div class="scroll" id="listBody"></div>
+      <button class="btn" id="listMore" type="button" hidden style="margin-top:12px">Show 100 More</button>
+    </div></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><h3>Sources</h3><p>欧洲自营价格表 (中欧报价表), 欧洲非自营价格表, 成都（城厢站）欧线与重庆非自营, and NEP跨里海报价表. The 东南亚 sheets are excluded. No Jiangxi origin has a Budapest price, so Wuhan and Changsha are the nearest origins to Yichun.</p></div>
+    <div><h3>Versions</h3><p>Each quote date uses one file: the 更新 copy first, otherwise the most recently saved copy. The price list shows how many other copies were ignored.</p></div>
+    <div><h3>Departure Months</h3><p>A price listed for two months, such as 9-10月, counts under both. The menu opens on the latest month in the data.</p></div>
+    <div><h3>Base Rate and All-In</h3><p>All-in adds the fees a sheet lists for this destination: the COC box pickup charge in the origin city and any fee marked 不含. The 不绕区 surcharge is added only when ticked under More Filters.</p></div>
+    <div><h3>Exchange Rate</h3><p>USD comes from the sheet where given. RMB-only prices use the RMB/USD rate implied by that day's own sheets (about 6.68–6.85 in this period).</p></div>
+    <div><h3>Updating</h3><p>Add the new export folder to Rail Freight, run <span class="mono">_portal/extract.py</span>, then ask Claude to republish. New destinations are added in the script's DESTINATIONS list.</p></div>
+    <div id="fGen"></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+"use strict";
+const DATA = __DATA__;
+const ROWS = DATA.rows, REM = DATA.remarks;
+const ORIGIN_SHORT = {"Chengdu (Chengxiang)":"成都城厢 Chengdu","Chongqing (Tuanjiecun)":"重庆团结村 Chongqing","Xi'an (Intl Port)":"西安国际港 Xi'an","Wuhan":"武汉 Wuhan","Changsha":"长沙 Changsha"};
+const DEST_CN = {"Budapest":"布达佩斯","Hamburg":"汉堡","Duisburg":"杜伊斯堡"};
+const dName = d => DEST_CN[d]?DEST_CN[d]+" "+d:d;
+const PROD_NAME = {"Station-to-station 站到站":"站到站 Station-to-Station","Trans-Caspian 跨里海":"跨里海 Trans-Caspian","South China door-to-station 华南门到站":"华南门到站 South China Door-to-Station"};
+const prName = p => PROD_NAME[p]||p;
+const opName = o => o.startsWith("自营")?"自营 Own Trains":"非自营 Third-Party";
+const flip = s => s.split(" / ").map(x=>{ const m=x.match(/^(.*?) ([\u4e00-\u9fa5]+)$/); return m?m[2]+" "+m[1]:x; }).join(" / ");
+const PRODUCTS = [
+  {k:"Station-to-station 站到站",label:"站到站 Station-to-Station",on:true},
+  {k:"Trans-Caspian 跨里海",label:"跨里海 Trans-Caspian",on:true},
+  {k:"South China door-to-station 华南门到站",label:"华南门到站 South China Door-to-Station",on:false}];
+const OPS = [{k:"自营 own",label:"自营 Own Trains"},{k:"非自营 3rd-party",label:"非自营 Third-Party"}];
+const SERIES = ["--s1","--s2","--s3","--s4","--s5","--s6","--s7","--s8"];
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTH_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const mName = m => `${m}月 ${MONTH_FULL[m-1]}`;
+
+/* months a price applies to: "9-10月" -> [9,10], "7月" -> [7] */
+const monthsOf = m => { const n=(m||"").match(/\d+/g); if(!n) return []; const a=+n[0], b=+(n[1]||n[0]); const out=[]; for(let x=a;x<=b&&out.length<12;x++) out.push(x); return out; };
+ROWS.forEach(r=>{ r.ms=monthsOf(r.m); r.span=r.ms.length; });
+const oName = o => ORIGIN_SHORT[o]||o;
+const DESTS=[...new Set(ROWS.map(r=>r.ds))].sort();
+const ORIGINS=[...new Set(ROWS.map(r=>r.o))].sort();
+const MULTI_DEST = DESTS.length>1;
+
+const S = {section:"route", view:"lookup", origin:null, dest:null, month:null, size:"40HQ", basis:"base", cur:"USD", cond:false,
+  prod:new Set(PRODUCTS.filter(p=>p.on).map(p=>p.k)), op:new Set(OPS.map(o=>o.k)),
+  pins:null, boxes:{}, range:"all", table:false, asof:null, laneMode:"origins", q:"", onlyPins:false, listN:100, chgAll:false};
+const store={get(){try{return JSON.parse(localStorage.getItem("nep-rail-tracker-v4")||"null")}catch(e){return null}},set(v){try{localStorage.setItem("nep-rail-tracker-v4",JSON.stringify(v))}catch(e){}}};
+const saved=store.get();
+if(saved){ for(const k of ["origin","dest","size","basis","cur","cond","range","view","pins","boxes","laneMode"]) if(saved[k]!==undefined&&saved[k]!==null) S[k]=saved[k]; }
+const persist=()=>store.set({origin:S.origin,dest:S.dest,size:S.size,basis:S.basis,cur:S.cur,cond:S.cond,range:S.range,view:S.view,pins:S.pins,boxes:S.boxes,laneMode:S.laneMode});
+if(!ORIGINS.includes(S.origin)) S.origin=ORIGINS.includes("Chengdu (Chengxiang)")?"Chengdu (Chengxiang)":ORIGINS[0];
+if(!DESTS.includes(S.dest)) S.dest=DESTS.includes("Budapest")?"Budapest":DESTS[0];
+
+const $=id=>document.getElementById(id);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtD=d=>{const [y,m,dd]=d.split("-");return MON[+m-1]+" "+(+dd);};
+const fmtDY=d=>fmtD(d)+" "+d.slice(0,4);
+const toD=t=>new Date(t).toISOString().slice(0,10);
+const days=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
+const sym=()=>S.cur==="USD"?"$":"¥";
+const money=v=>v==null||isNaN(v)?"—":(v<0?"−":"")+sym()+Math.round(Math.abs(v)).toLocaleString("en-US");
+const signed=v=>(v>0?"+":v<0?"−":"±")+sym()+Math.round(Math.abs(v)).toLocaleString("en-US");
+const toCur=(usd,r)=>S.cur==="USD"?usd:usd*r.fx;
+function parts(r){ return {base:r.usd, fees:S.basis==="allin"&&r.ai!=null?r.ai-r.usd:0, cond:S.cond&&r.cu?r.cu:0}; }
+function value(r){ const p=parts(r); if(S.cur==="RMB"&&r.cur==="RMB"&&!p.fees&&!p.cond) return r.rmb; return toCur(p.base+p.fees+p.cond,r); }
+
+/* ---------- routes (all destinations, current month / size / filters) ---------- */
+function svcShort(sv){ return sv==="Standard"||sv.startsWith("Trans")?"":flip(sv); }
+function routeLabel(r){ const b=[r.op.split(" ")[0]]; if(!r.pr.startsWith("Station")) b.push(r.pr.startsWith("Trans")?"跨里海 Trans-Caspian":"华南门到站 South China Door"); const s=svcShort(r.sv); if(s) b.push(s); return b.join(" · "); }
+let ROUTES=new Map(), SEL=[];
+function monthsAvailable(){ const set=new Set(); ROWS.forEach(r=>{ if(r.sz===S.size) r.ms.forEach(m=>set.add(m)); }); return [...set].sort((a,b)=>b-a); }
+function build(){
+  const ms=monthsAvailable(); if(!ms.includes(S.month)) S.month=ms[0];
+  const pick=new Map();
+  ROWS.forEach(r=>{ if(r.sz!==S.size||!S.prod.has(r.pr)||!S.op.has(r.op)||!r.ms.includes(S.month)) return;
+    const k=r.lid+"|"+r.bx+"|"+r.d, p=pick.get(k); if(!p||r.span<p.span) pick.set(k,r); });   // prefer a single-month listing over a range
+  SEL=[...pick.values()].sort((a,b)=>a.d.localeCompare(b.d));
+  ROUTES=new Map();
+  SEL.forEach(r=>{ if(!ROUTES.has(r.lid)) ROUTES.set(r.lid,{id:r.lid,o:r.o,ds:r.ds,op:r.op,pr:r.pr,sv:r.sv,label:routeLabel(r),
+      full:oName(r.o)+(MULTI_DEST?" → "+dName(r.ds):"")+" · "+routeLabel(r),SOC:[],COC:[]}); ROUTES.get(r.lid)[r.bx].push(r); });
+  if(S.pins===null) S.pins=bestPerOrigin(S.dest);
+}
+const routesWhere=f=>[...ROUTES.values()].filter(f);
+const lastOf=(rt,bx)=>{const a=rt[bx];return a.length?a[a.length-1]:null;};
+const keyVal=rt=>{const s=lastOf(rt,"SOC"),c=lastOf(rt,"COC");return s?value(s):c?value(c)+1e6:1e12;};
+function bestPerOrigin(dest){ const b={}; routesWhere(x=>x.ds===dest).forEach(rt=>{ if(!b[rt.o]||keyVal(rt)<keyVal(b[rt.o])) b[rt.o]=rt; }); return Object.values(b).map(x=>x.id); }
+const isPinned=id=>S.pins.includes(id);
+function togglePin(id){ S.pins=isPinned(id)?S.pins.filter(x=>x!==id):[...S.pins,id]; persist(); }
+const pinColor=id=>{const i=S.pins.indexOf(id);return i<0?"--muted":SERIES[i%SERIES.length];};
+function atDate(a,d){let i=-1;for(let k=0;k<a.length;k++) if(a[k].d<=d) i=k;return i;}
+
+/* ---------- controls ---------- */
+function seg(id,opts,key,cb){ const el=$(id); el.innerHTML="";
+  opts.forEach(([v,l])=>{ const b=document.createElement("button"); b.type="button"; b.textContent=l; b.setAttribute("aria-pressed",S[key]===v);
+    b.onclick=()=>{ S[key]=v; persist(); seg(id,opts,key,cb); (cb||renderAll)(); }; el.appendChild(b); }); }
+function chipset(id,list,set){ const el=$(id); el.innerHTML="";
+  list.forEach(p=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=p.label; b.setAttribute("aria-pressed",set.has(p.k));
+    b.onclick=()=>{ set.has(p.k)?set.delete(p.k):set.add(p.k); chipset(id,list,set); renderAll(); }; el.appendChild(b); }); }
+function fillSelects(){
+  $("f-origin").innerHTML=ORIGINS.map(o=>`<option value="${esc(o)}"${o===S.origin?" selected":""}>${esc(oName(o))}</option>`).join("");
+  $("f-dest").innerHTML=DESTS.map(d=>`<option value="${esc(d)}"${d===S.dest?" selected":""}>${esc(dName(d))}</option>`).join("");
+  $("f-month").innerHTML=monthsAvailable().map(m=>`<option value="${m}"${m===S.month?" selected":""}>${mName(m)}</option>`).join("");
+}
+$("f-origin").onchange=e=>{S.origin=e.target.value;persist();renderSection();};
+$("f-dest").onchange=e=>{S.dest=e.target.value;S.asof=null;persist();renderSection();};
+$("f-month").onchange=e=>{S.month=+e.target.value;S.asof=null;renderAll();};
+const condEl=$("f-cond"); condEl.checked=S.cond; condEl.onchange=()=>{S.cond=condEl.checked;persist();renderAll();};
+$("moreBtn").onclick=()=>{const p=$("morePanel");p.hidden=!p.hidden;$("moreBtn").setAttribute("aria-expanded",!p.hidden);};
+seg("f-size",[["40HQ","40HQ"],["2x20ft","2×20ft Set"]],"size");
+seg("f-basis",[["base","Base Rate"],["allin","All-In"]],"basis");
+seg("f-cur",[["USD","USD"],["RMB","RMB"]],"cur");
+seg("f-range",[["all","All"],["91","3 Months"],["28","4 Weeks"]],"range",()=>renderTimeline());
+seg("f-lanemode",[["origins","Every Origin"],["dests","Every Destination"]],"laneMode",()=>{ S.asof=null; railFields(); renderLane(); });
+chipset("f-prod",PRODUCTS,S.prod); chipset("f-op",OPS,S.op);
+function viewToggle(){ seg("viewToggle",[["lookup","Lookup"],["timeline","Timeline"]],"view",()=>renderSection()); }
+viewToggle();
+function laneIds(){ return [...new Set(ROWS.filter(r=>r.o===S.origin&&r.ds===S.dest&&r.sz===S.size&&S.prod.has(r.pr)&&S.op.has(r.op)).map(r=>r.lid))]; }
+$("pinCur").onclick=()=>{ const add=laneIds().filter(id=>!S.pins.includes(id)); if(add.length){ S.pins=[...S.pins,...add]; persist(); renderTimeline(); } };
+$("pinClear").onclick=()=>{ S.pins=[]; persist(); renderTimeline(); };
+$("tableToggle").onclick=()=>{ S.table=!S.table; $("tableToggle").setAttribute("aria-pressed",S.table); renderTimeline(); };
+$("f-asof").onchange=e=>{S.asof=e.target.value;renderLane();};
+$("q").oninput=e=>{S.q=e.target.value.trim().toLowerCase();S.listN=100;renderList();};
+$("onlyPins").onchange=e=>{S.onlyPins=e.target.checked;S.listN=100;renderList();};
+$("listMore").onclick=()=>{S.listN+=100;renderList();};
+const SECS=["route","lane","list"];
+function railFields(){
+  const s=S.section;
+  $("originField").hidden = false;
+  $("destField").hidden   = false;
+  $("monthField").hidden  = (s==="route"&&S.view==="timeline");
+}
+function showSection(s){ S.section=s; SECS.forEach(x=>{ $("sec-"+x).setAttribute("aria-selected",x===s); $("p-"+x).hidden=x!==s; });
+  try{history.replaceState(null,"","#"+s);}catch(e){} renderSection(); }
+SECS.forEach((s,i)=>{ const b=$("sec-"+s); b.onclick=()=>showSection(s);
+  b.onkeydown=e=>{ if(e.key==="ArrowRight"||e.key==="ArrowLeft"){ const n=SECS[(i+(e.key==="ArrowRight"?1:2))%3]; showSection(n); $("sec-"+n).focus(); } }; });
+
+/* ---------- lookup: one card per route ---------- */
+function deltaChip(a,prev){ if(!prev) return `<span class="chip flat">First Quote</span>`;
+  const d=value(a)-value(prev); if(Math.abs(d)<1) return `<span class="chip flat">Unchanged since ${fmtD(prev.d)}</span>`;
+  return `<span class="chip ${d>0?"up":"down"}">${d>0?"▲":"▼"} ${signed(d)} vs ${fmtD(prev.d)}</span>`; }
+function sparkSVG(a,box){
+  const pts=a.slice(-16), w=460,h=140,pl=8,pr=8,pt=18,pb=22;
+  if(pts.length<2) return '<p class="note">Only one quote so far for this route.</p>';
+  const v=pts.map(value), mn=Math.min(...v), mx=Math.max(...v), rg=(mx-mn)||1;
+  const t0=+new Date(pts[0].d), t1=+new Date(pts[pts.length-1].d), tr=(t1-t0)||1;
+  const X=d=>pl+(+new Date(d)-t0)/tr*(w-pl-pr), Y=y=>mx===mn?(pt+h-pb)/2:pt+(1-(y-mn)/rg)*(h-pt-pb);
+  let d=`M${X(pts[0].d).toFixed(1)},${Y(v[0]).toFixed(1)}`; for(let i=1;i<pts.length;i++) d+=`H${X(pts[i].d).toFixed(1)}V${Y(v[i]).toFixed(1)}`;
+  const last=pts.length-1, iMin=v.indexOf(mn), iMax=v.indexOf(mx), anc=i=>i===0?"start":i===last?"end":"middle";
+  const lab=(i,txt,dy)=>`<text x="${X(pts[i].d).toFixed(1)}" y="${Math.max(12,Math.min(h-pb-4,Y(v[i])+dy)).toFixed(1)}" text-anchor="${anc(i)}" style="fill:var(--ink-2);font:500 11px 'IBM Plex Mono',monospace">${txt}</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Recent ${box} quotes">
+    <line x1="${pl}" x2="${w-pr}" y1="${h-pb}" y2="${h-pb}" style="stroke:var(--grid)"/>
+    <path d="${d}" style="fill:none;stroke:var(--accent);stroke-width:2"/>
+    ${pts.map((p,i)=>`<circle cx="${X(p.d).toFixed(1)}" cy="${Y(v[i]).toFixed(1)}" r="${i===last?4:2.5}" style="fill:${i===last?"var(--accent)":"var(--surface)"};stroke:var(--accent);stroke-width:1.5"><title>${fmtD(p.d)}: ${money(v[i])}</title></circle>`).join("")}
+    ${mx!==mn?lab(iMax,"High "+money(mx),-7)+(iMin!==iMax?lab(iMin,"Low "+money(mn),16):""):""}
+    <text x="${pl}" y="${h-6}" style="fill:var(--muted);font:11px 'IBM Plex Sans',sans-serif">${fmtD(pts[0].d)}</text>
+    <text x="${w-pr}" y="${h-6}" text-anchor="end" style="fill:var(--muted);font:11px 'IBM Plex Sans',sans-serif">${fmtD(pts[last].d)}</text></svg>`;
+}
+function routeCard(rt){
+  let box=S.boxes[rt.id]||"SOC"; if(!rt[box].length) box=box==="SOC"?"COC":"SOC";
+  const a=rt[box], cur=a[a.length-1], prev=a.length>1?a[a.length-2]:null;
+  const newest=SEL.length?SEL[SEL.length-1].d:cur.d, age=days(cur.d,newest);
+  const btn=bx=>{ const l=lastOf(rt,bx); return `<button type="button" class="boxbtn" data-bx="${bx}" aria-pressed="${box===bx}"${l?"":" disabled"}><div class="t">${bx} · ${esc(S.size==="2x20ft"?"2×20ft":S.size)}</div><div class="v${l?"":" na"}">${l?money(value(l)):"Not Quoted"}</div></button>`; };
+  const p=parts(cur), f=v=>money(toCur(v,cur));
+  let bd=`<span>Base rate</span><span>${f(p.base)}</span>`;
+  if(S.basis==="allin") bd+=`<span>${esc(cur.aib&&cur.aib!=="no extra fees listed in sheet"?cur.aib.replace(/^\+ /,""):"Listed fees: none in sheet")}</span><span>${p.fees?"+"+f(p.fees):"—"}</span>`;
+  if(S.cond) bd+=`<span>${esc(cur.cb||"不绕区: not listed for this route")}</span><span>${p.cond?"+"+f(p.cond):"—"}</span>`;
+  bd+=`<span class="tot">${S.basis==="allin"?"All-in":"Total"}</span><span class="tot">${money(value(cur))}</span>`;
+  const pinned=isPinned(rt.id);
+  return `<article class="card rcard" data-id="${esc(rt.id)}">
+   <div class="quote">
+    <div class="cardtop"><div><div class="route-line"><span>${esc(oName(rt.o))}</span><span class="arrow">→</span><span>${esc(dName(rt.ds))}</span></div>
+      <div class="route-sub">${esc(opName(rt.op))} · ${esc(prName(rt.pr))}${svcShort(rt.sv)?" · "+esc(svcShort(rt.sv)):""}</div></div>
+      <button type="button" class="pinit" data-pin="${esc(rt.id)}" aria-pressed="${pinned}">${pinned?"Pinned ✓":"Pin to Timeline"}</button></div>
+    <div class="boxrow">${btn("SOC")}${btn("COC")}</div>
+    <div class="figure"><span class="val">${money(value(cur))}</span>${deltaChip(cur,prev)}</div>
+    <dl class="meta-row">
+      <div class="meta"><dt>Quote Date</dt><dd>${fmtDY(cur.d)}</dd></div>
+      <div class="meta"><dt>Departures</dt><dd>${esc(cur.m||"—")}</dd></div>
+      <div class="meta"><dt>As Quoted</dt><dd class="mono">${cur.cur==="USD"?"$":"¥"}${Math.round(cur.amt).toLocaleString("en-US")}</dd></div>
+      <div class="meta"><dt>ETD</dt><dd>${esc((cur.etd||[]).filter(e=>+e[0].slice(5,7)===S.month).map(e=>fmtD(e[0])).join(", ")||"—")}<br><span class="note">${esc(ETD_LABEL[cur.et]||"Listed dates plus weekly schedule")}</span></dd></div>
+      <div class="meta"><dt>Schedule</dt><dd>${esc(cur.sch||"—")}</dd></div>
+      <div class="meta"><dt>Route / Border</dt><dd>${esc(cur.port||"—")}</dd></div>
+      <div class="meta"><dt>Source</dt><dd><span class="mono" style="font-size:12px">${esc(cur.f.split("/").pop())}</span><br><span class="note">${esc(cur.sh)} · row ${cur.r}</span></dd></div>
+    </dl>
+   </div>
+   <div class="side">
+    <h3>Recent Quotes <span class="note" style="font:400 12px 'IBM Plex Sans',sans-serif">${box} · last ${Math.min(a.length,16)}</span></h3>
+    <div class="spark">${sparkSVG(a,box)}</div>
+    ${age>21?`<div class="notice warn"><div><b>Older Quote</b>This route's latest ${box} quote for ${mName(S.month)} departures is ${age} days older than the newest quote in the data.</div></div>`:""}
+    ${(S.basis==="allin"||S.cond)?`<div class="notice info"><div style="width:100%"><b>How the Price Is Built</b><div class="bd">${bd}</div></div></div>`:""}
+    ${box==="COC"&&cur.pk?`<div class="notice"><div><b>COC Box Pickup</b>${esc(cur.pk)}</div></div>`:""}
+    ${REM[cur.rk]?`<details class="dt"><summary>Sheet Remark</summary><p>${esc(REM[cur.rk])}</p></details>`:""}
+    <p class="note" style="margin:0">USD basis: ${esc(cur.ub)}${cur.vi?` · ${cur.vi} other cop${cur.vi>1?"ies":"y"} of this sheet ignored`:""}</p>
+   </div></article>`;
+}
+function renderLookup(){
+  const list=routesWhere(x=>x.o===S.origin&&x.ds===S.dest).sort((a,b)=>keyVal(a)-keyVal(b));
+  $("cards").innerHTML=list.length?list.map(routeCard).join("")
+    :`<div class="card"><div class="body"><p class="empty">No ${esc(oName(S.origin))} → ${esc(dName(S.dest))} prices for ${mName(S.month)} departures with these filters. Try another month or origin, or check More Filters.</p></div></div>`;
+  renderLookupBind(); renderAlts();
+}
+function renderLookupBind(){
+  $("cards").querySelectorAll(".rcard").forEach(c=>{ const id=c.dataset.id;
+    c.querySelectorAll(".boxbtn").forEach(b=>b.onclick=()=>{ S.boxes[id]=b.dataset.bx; persist(); const n=document.createElement("div"); n.innerHTML=routeCard(ROUTES.get(id)); c.replaceWith(n.firstElementChild); renderLookupBind(); });
+    const pb=c.querySelector("[data-pin]"); pb.onclick=()=>{ togglePin(id); const on=isPinned(id); pb.setAttribute("aria-pressed",on); pb.textContent=on?"Pinned ✓":"Pin to Timeline"; };
+  });
+}
+function renderAlts(){
+  const list=routesWhere(x=>x.ds===S.dest).sort((a,b)=>keyVal(a)-keyVal(b));
+  $("altTitle").textContent=`All Routes to ${dName(S.dest)} · ${mName(S.month)} Departures`;
+  const lows=bx=>{const v=list.map(x=>lastOf(x,bx)).filter(Boolean).map(value);return v.length?Math.min(...v):null;};
+  const mins={SOC:lows("SOC"),COC:lows("COC")};
+  const c=(x,bx)=>{ const l=lastOf(x,bx); if(!l) return `<td class="num note">—</td>`; const v=value(l); return `<td class="num">${money(v)}${Math.abs(v-mins[bx])<1?'<div class="best">Low</div>':""}</td>`; };
+  $("altBody").innerHTML=list.length?`<table><thead><tr><th>Route</th><th class="num">SOC</th><th class="num">COC</th><th class="num">Quoted</th></tr></thead><tbody>`+
+    list.map(x=>{ const l=lastOf(x,"SOC")||lastOf(x,"COC"); return `<tr class="clickable${x.o===S.origin?" current":""}" tabindex="0" data-o="${esc(x.o)}"><td class="rt"><b>${esc(oName(x.o))}</b><div class="s">${esc(x.label)}</div></td>${c(x,"SOC")}${c(x,"COC")}<td class="num note">${fmtD(l.d)}</td></tr>`; }).join("")+"</tbody></table>":'<p class="note">No routes for this month.</p>';
+  $("altBody").querySelectorAll("tr[data-o]").forEach(tr=>{ const go=()=>{ S.origin=tr.dataset.o; persist(); fillSelects(); renderLookup(); window.scrollTo({top:0,behavior:"smooth"}); };
+    tr.onclick=go; tr.onkeydown=e=>{ if(e.key==="Enter"){e.preventDefault();go();} }; });
+}
+
+/* ---------- timeline: x-axis is the departure date (ETD) ---------- */
+const charts={};
+const endLabels={id:"endLabels",afterDatasetsDraw(chart){
+  const {ctx,chartArea}=chart, items=[];
+  chart.data.datasets.forEach((ds,i)=>{ const meta=chart.getDatasetMeta(i); if(meta.hidden||!ds.data.length) return; const el=meta.data[meta.data.length-1]; if(!el) return;
+    items.push({y:el.y,x:el.x,c:ds.borderColor,v:ds.data[ds.data.length-1].y}); });
+  items.sort((a,b)=>a.y-b.y);
+  for(let i=1;i<items.length;i++) if(items[i].y-items[i-1].y<14) items[i].y=items[i-1].y+14;
+  ctx.save(); ctx.font="500 11.5px 'IBM Plex Mono',monospace"; ctx.textBaseline="middle";
+  items.forEach(it=>{ const x=chartArea.right+8; ctx.fillStyle=it.c; ctx.beginPath(); ctx.arc(x+3,it.y,3.5,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=css("--ink"); ctx.fillText(money(it.v),x+11,it.y); });
+  ctx.restore(); }};
+const ETD_LABEL={listed:"Listed ETD",weekly:"From weekly schedule",assumed:"Assumed mid-month ETD"};
+function tlRoutes(){
+  // every quote for the pinned routes, any departure month, current size and filters
+  const m=new Map();
+  ROWS.forEach(r=>{ if(!S.pins.includes(r.lid)||r.sz!==S.size||!S.prod.has(r.pr)||!S.op.has(r.op)) return;
+    if(!m.has(r.lid)) m.set(r.lid,{id:r.lid,o:r.o,ds:r.ds,op:r.op,pr:r.pr,sv:r.sv,label:routeLabel(r),full:oName(r.o)+(MULTI_DEST?" → "+dName(r.ds):"")+" · "+routeLabel(r),rows:[]});
+    m.get(r.lid).rows.push(r); });
+  return S.pins.map(id=>m.get(id)).filter(Boolean);
+}
+function etdPoints(rt,bx){
+  // for each departure date: the latest quote made on or before it (the final price), plus the range of all such quotes
+  const byEtd=new Map();
+  rt.rows.forEach(r=>{ if(r.bx!==bx) return; (r.etd||[]).forEach(([d,t])=>{ if(r.d>d) return; const e=byEtd.get(d)||{d,t,q:[]}; if(t==="listed") e.t="listed"; else if(t==="weekly"&&e.t==="assumed") e.t="weekly"; e.q.push(r); byEtd.set(d,e); }); });
+  return [...byEtd.values()].map(e=>{ e.q.sort((a,b)=>a.d.localeCompare(b.d)||b.span-a.span); const fin=e.q[e.q.length-1], vs=e.q.map(value);
+    return {x:+new Date(e.d),y:value(fin),etd:e.d,t:e.t,r:fin,lo:Math.min(...vs),hi:Math.max(...vs),n:e.q.length}; }).sort((a,b)=>a.x-b.x);
+}
+function renderTimeline(){
+  { const ids=laneIds(), b=$("pinCur"), all=ids.length&&ids.every(id=>S.pins.includes(id));
+    b.disabled=!ids.length||all; b.textContent=!ids.length?"No Routes for This Lane":all?"✓ All Pinned":"+ Pin Current Route";
+    b.title=ids.length?`Pins ${ids.length} route${ids.length>1?"s":""}: ${oName(S.origin)} → ${dName(S.dest)}`:""; }
+  const pl=tlRoutes();
+  const pts={}; pl.forEach(x=>{ pts[x.id]={SOC:etdPoints(x,"SOC"),COC:etdPoints(x,"COC")}; });
+  const allX=pl.flatMap(x=>[...pts[x.id].SOC,...pts[x.id].COC].map(p=>p.x));
+  const last=allX.length?Math.max(...allX):Date.now(), first=allX.length?Math.min(...allX):last;
+  const from=S.range==="all"?first:last-(+S.range)*864e5;
+  $("chartView").hidden=S.table; $("tableView").hidden=!S.table;
+  const surf=css("--surface");
+  const sets={SOC:[],COC:[]};
+  pl.forEach(x=>["SOC","COC"].forEach(bx=>{ const d=pts[x.id][bx].filter(p=>p.x>=from); if(!d.length) return; const c=css(pinColor(x.id));
+    sets[bx].push({label:x.full,data:d,borderColor:c,backgroundColor:c,borderWidth:2,tension:0,
+      pointRadius:d.map(p=>p.t==="assumed"?4:2.6),pointHoverRadius:6,pointBorderColor:c,pointBorderWidth:1.6,
+      pointBackgroundColor:d.map(p=>p.t==="assumed"?surf:c)}); }));
+  if(!S.table && window.Chart){
+    const ys=[...sets.SOC,...sets.COC].flatMap(s=>s.data.map(p=>p.y));
+    const mn=ys.length?Math.min(...ys):0, mx=ys.length?Math.max(...ys):1, pad=(mx-mn)*.08||300;
+    const ink=css("--ink"), muted=css("--muted"), grid=css("--grid"), rule=css("--rule");
+    ["SOC","COC"].forEach(bx=>{ if(charts[bx]) charts[bx].destroy();
+      charts[bx]=new Chart($(bx==="SOC"?"ch-soc":"ch-coc"),{type:"line",data:{datasets:sets[bx]},plugins:[endLabels],options:{responsive:true,maintainAspectRatio:false,animation:false,layout:{padding:{right:S.cur==="RMB"?92:78}},interaction:{mode:"nearest",intersect:true},
+        plugins:{legend:{display:false},tooltip:{backgroundColor:surf,titleColor:ink,bodyColor:ink,borderColor:rule,borderWidth:1,
+          callbacks:{title:it=>it.length?"ETD "+fmtDY(it[0].raw.etd)+" · "+ETD_LABEL[it[0].raw.t]:"",
+            label:it=>{ const p=it.raw; return `${it.dataset.label}: ${money(p.y)}`; },
+            afterLabel:it=>{ const p=it.raw; return `Quoted ${fmtD(p.r.d)} (${p.r.m})`+(p.n>1&&Math.abs(p.hi-p.lo)>=1?` · ${p.n} quotes, ${money(p.lo)}–${money(p.hi)}`:p.n>1?` · ${p.n} quotes, unchanged`:""); }}}},
+        scales:{x:{type:"linear",min:from,max:last,grid:{color:grid},ticks:{color:muted,maxTicksLimit:8,callback:v=>fmtD(toD(v))},title:{display:true,text:"Departure Date (ETD)",color:muted}},
+          y:{min:Math.floor((mn-pad)/100)*100,max:Math.ceil((mx+pad)/100)*100,grid:{color:grid},ticks:{color:muted,callback:v=>money(v)}}}}}); });
+  }
+  const nAssumed=pl.reduce((s,x)=>s+[...pts[x.id].SOC,...pts[x.id].COC].filter(p=>p.x>=from&&p.t==="assumed").length,0);
+  $("chartNote").textContent=(!window.Chart&&!S.table?"The chart library could not load. Switch to Table View to see the numbers. ":"")+
+    (pl.length?`Each point is a departure date, priced at the latest quote made on or before it. Solid dots are ETDs listed in the sheet or taken from its weekly schedule; hollow dots are assumed mid-month ETDs where the sheet gives no date${nAssumed?` (${nAssumed} in view)`:""}. Both charts share one ${S.cur} scale.`:"");
+  if(S.table){
+    const ds=[...new Set(pl.flatMap(x=>[...pts[x.id].SOC,...pts[x.id].COC].filter(p=>p.x>=from).map(p=>p.etd)))].sort().reverse();
+    const mark=t=>t==="assumed"?'<sup title="Assumed mid-month ETD">*</sup>':t==="weekly"?'<sup title="From weekly schedule">†</sup>':"";
+    $("tableView").innerHTML=pl.length?`<table><thead><tr><th>Departure (ETD)</th>${pl.map(x=>`<th class="num" colspan="2"><span class="sw" style="background:var(${pinColor(x.id)})"></span> ${esc(x.full)}</th>`).join("")}</tr><tr><th></th>${pl.map(()=>`<th class="num">SOC</th><th class="num">COC</th>`).join("")}</tr></thead><tbody>`+
+      ds.map(d=>`<tr><td class="mono">${fmtDY(d)}</td>${pl.map(x=>["SOC","COC"].map(bx=>{ const p=pts[x.id][bx].find(y=>y.etd===d); return `<td class="num">${p?money(p.y)+mark(p.t)+`<div class="note">quoted ${fmtD(p.r.d)}</div>`:'<span class="note">·</span>'}</td>`; }).join("")).join("")}</tr>`).join("")+
+      `</tbody></table><p class="note">* Assumed mid-month ETD · † From weekly schedule · no mark: ETD listed in the sheet</p>`:"";
+  }
+  $("legend").innerHTML=pl.length?pl.map(x=>`<span class="item"><span class="sw" style="background:var(${pinColor(x.id)})"></span>${esc(x.full)}<button type="button" data-unpin="${esc(x.id)}" aria-label="Unpin ${esc(x.full)}">×</button></span>`).join("")
+    :'<span class="note">No routes pinned. Pick an origin and destination above and press + Pin Current Route, or use Pin to Timeline on a Lookup card.</span>';
+  $("legend").querySelectorAll("button[data-unpin]").forEach(b=>b.onclick=()=>{ togglePin(b.dataset.unpin); renderTimeline(); });
+  // price changes: consecutive quotes for the same route, box and departure month
+  const out=[];
+  pl.forEach(x=>["SOC","COC"].forEach(bx=>{ const byM={}; x.rows.filter(r=>r.bx===bx).forEach(r=>r.ms.forEach(m=>{ (byM[m]=byM[m]||new Map()); const p=byM[m].get(r.d); if(!p||r.span<p.span) byM[m].set(r.d,r); }));
+    Object.entries(byM).forEach(([m,mp])=>{ const a=[...mp.values()].sort((p,q)=>p.d.localeCompare(q.d)); for(let i=1;i<a.length;i++){ const u=value(a[i-1]),w=value(a[i]); if(Math.abs(w-u)>=1) out.push({x,bx,m:+m,u,w,r:a[i]}); } }); }));
+  out.sort((a,b)=>b.r.d.localeCompare(a.r.d)||b.m-a.m);
+  $("chgNote").textContent=`${out.length} quote changes for the pinned routes`;
+  const n=S.chgAll?out.length:10;
+  $("chgBody").innerHTML=out.length?`<ul class="movers">${out.slice(0,n).map(c=>`<li><span class="rt"><span class="sw" style="background:var(${pinColor(c.x.id)})"></span> <b>${esc(c.x.full)}</b> · ${c.bx} · ${mName(c.m)} departures <span class="note">quoted ${fmtD(c.r.d)}</span></span><span class="dl ${c.w>c.u?"up":"down"}">${money(c.u)} → ${money(c.w)} (${signed(c.w-c.u)})</span></li>`).join("")}</ul>`+(out.length>10?`<button class="btn" id="chgMore" type="button" style="margin-top:10px">${S.chgAll?"Show Fewer":"Show All "+out.length}</button>`:""):'<p class="note">No price changes for the pinned routes.</p>';
+  const cm=$("chgMore"); if(cm) cm.onclick=()=>{S.chgAll=!S.chgAll;renderTimeline();};
+}
+
+/* ---------- lane comparison ---------- */
+function renderLane(){
+  const byOrigins=S.laneMode==="origins";
+  const list=routesWhere(x=>byOrigins?x.ds===S.dest:x.o===S.origin);
+  const ds=[...new Set(list.flatMap(x=>[...x.SOC,...x.COC].map(r=>r.d)))].sort();
+  if(!S.asof||!ds.includes(S.asof)) S.asof=ds[ds.length-1];
+  $("f-asof").innerHTML=ds.slice().reverse().map(d=>`<option value="${d}"${d===S.asof?" selected":""}>${fmtDY(d)}</option>`).join("");
+  $("laneTitle").textContent=(byOrigins?`Every Origin → ${dName(S.dest)}`:`${oName(S.origin)} → Every Destination`)+` · ${mName(S.month)}`;
+  if(!list.length){ $("laneBody").innerHTML=`<p class="empty">No prices for ${mName(S.month)} departures with these filters.</p>`; $("lowBody").innerHTML=""; $("moversBody").innerHTML=""; $("rampKey").innerHTML=""; return; }
+  const rows=list.map(x=>{ const o={x}; ["SOC","COC"].forEach(bx=>{ const i=atDate(x[bx],S.asof); o[bx]=i>=0?{r:x[bx][i],p:i>0?x[bx][i-1]:null}:null; }); return o; }).filter(o=>o.SOC||o.COC);
+  const vals=bx=>rows.filter(o=>o[bx]).map(o=>value(o[bx].r)).sort((a,b)=>a-b);
+  const V={SOC:vals("SOC"),COC:vals("COC")};
+  const qcls=(bx,v)=>{ const a=V[bx]; if(a.length<2) return "q2"; const t=(v-a[0])/((a[a.length-1]-a[0])||1); return "q"+Math.min(5,1+Math.floor(t*5)); };
+  rows.sort((a,b)=>(a.SOC?value(a.SOC.r):1e12)-(b.SOC?value(b.SOC.r):1e12)||(a.COC?value(a.COC.r):1e12)-(b.COC?value(b.COC.r):1e12));
+  const cell=(o,bx)=>{ const e=o[bx]; if(!e) return `<td class="heat note" style="background:var(--surface-2)">Not Quoted</td>`;
+    const v=value(e.r), dd=e.p?v-value(e.p):null, age=days(e.r.d,S.asof);
+    return `<td class="heat ${qcls(bx,v)}">${money(v)}<div class="dl">${dd==null?"first quote":Math.abs(dd)<1?"unchanged":(dd>0?"▲ ":"▼ ")+signed(dd)}${age>21?` · ${age}d old`:""}</div></td>`; };
+  const name=x=>byOrigins?`<b>${esc(oName(x.o))}</b>`:`<b>${esc(dName(x.ds))}</b>`;
+  $("laneBody").innerHTML=`<table class="heatt"><colgroup><col style="width:30%"><col style="width:20%"><col style="width:20%"><col style="width:12%"><col style="width:10%"><col style="width:8%"></colgroup>
+    <thead><tr><th>Route</th><th class="num">SOC</th><th class="num">COC</th><th style="padding-left:12px">Quoted</th><th>Departures</th><th></th></tr></thead><tbody>`+
+    rows.map(o=>{ const any=(o.SOC||o.COC).r, pinned=isPinned(o.x.id);
+      return `<tr class="clickable" tabindex="0" data-id="${esc(o.x.id)}"><td class="rt" style="padding-right:12px">${name(o.x)}<div class="s">${esc(byOrigins?o.x.label:oName(o.x.o)+" · "+o.x.label)}</div></td>${cell(o,"SOC")}${cell(o,"COC")}<td class="note" style="padding-left:12px">${fmtD(any.d)}</td><td class="note">${esc(any.m)}</td><td><button type="button" class="pinbtn" data-pin="${esc(o.x.id)}" aria-pressed="${pinned}">${pinned?"Pinned":"Pin"}</button></td></tr>`; }).join("")+"</tbody></table>";
+  $("rampKey").innerHTML=`<span>Cheaper</span><span class="steps">${[1,2,3,4,5].map(i=>`<i style="background:var(--q${i})"></i>`).join("")}</span><span>Dearer</span><span>· Shading is within each column. Click a row to open its origin in Route Rates.</span>`;
+  $("laneBody").querySelectorAll("tr[data-id]").forEach(tr=>{ const go=e=>{ if(e.target.closest("button")) return; const x=ROUTES.get(tr.dataset.id); S.origin=x.o; S.dest=x.ds; S.view="lookup"; persist(); viewToggle(); fillSelects(); showSection("route"); };
+    tr.onclick=go; tr.onkeydown=e=>{ if(e.key==="Enter"){e.preventDefault();go(e);} }; });
+  $("laneBody").querySelectorAll("button[data-pin]").forEach(b=>b.onclick=()=>{ togglePin(b.dataset.pin); renderLane(); });
+  const low=bx=>{ const r=rows.filter(o=>o[bx]).sort((a,b)=>value(a[bx].r)-value(b[bx].r)); if(!r.length) return `<div class="meta"><dt>Lowest ${bx}</dt><dd class="note">No quote</dd></div>`;
+    const lo=r[0], hi=r[r.length-1]; return `<div class="meta"><dt>Lowest ${bx}</dt><dd><span class="mono" style="font-size:20px">${money(value(lo[bx].r))}</span><br>${esc(lo.x.full)}${r.length>1?`<br><span class="note">Highest is ${money(value(hi[bx].r)-value(lo[bx].r))} more</span>`:""}</dd></div>`; };
+  $("lowBody").innerHTML=`<dl class="meta-row" style="margin:0;padding:0;border:0">${low("SOC")}${low("COC")}</dl>`;
+  const since=toD(+new Date(S.asof)-14*864e5), mv=[];
+  list.forEach(x=>["SOC","COC"].forEach(bx=>{ const a=x[bx]; for(let i=1;i<a.length;i++){ if(a[i].d>S.asof||a[i].d<since) continue; const u=value(a[i-1]),w=value(a[i]); if(Math.abs(w-u)>=1) mv.push({x,bx,d:w-u,r:a[i]}); } }));
+  mv.sort((a,b)=>Math.abs(b.d)-Math.abs(a.d));
+  $("moversBody").innerHTML=mv.length?`<ul class="movers">${mv.slice(0,8).map(m=>`<li><span class="rt"><b>${esc(oName(m.x.o))}</b>${MULTI_DEST?" → "+esc(dName(m.x.ds)):""} · ${m.bx}<br><span class="note">${esc(m.x.label)} · ${fmtD(m.r.d)}</span></span><span class="dl ${m.d>0?"up":"down"}">${signed(m.d)}</span></li>`).join("")}</ul>`:'<p class="note">No price changes in the 14 days before this date.</p>';
+}
+
+/* ---------- price list ---------- */
+function renderList(){
+  let rs=ROWS.filter(r=>r.ds===S.dest&&r.o===S.origin&&r.sz===S.size&&S.prod.has(r.pr)&&S.op.has(r.op)&&r.ms.includes(S.month));
+  if(S.onlyPins) rs=rs.filter(r=>isPinned(r.lid));
+  if(S.q) rs=rs.filter(r=>[r.o,oName(r.o),r.op,r.pr,r.sv,r.f,r.sh,REM[r.rk],r.dest,r.sch,r.d,r.bx,r.m].join(" ").toLowerCase().includes(S.q));
+  rs=rs.slice().sort((a,b)=>b.d.localeCompare(a.d)||a.lid.localeCompare(b.lid)||a.bx.localeCompare(b.bx));
+  $("listCount").textContent=`${rs.length} prices · ${oName(S.origin)} → ${dName(S.dest)} · ${mName(S.month)} departures`;
+  if(!rs.length){ $("listBody").innerHTML='<p class="empty">No prices match. Clear the search, untick Pinned Routes Only, or pick another origin or month.</p>'; $("listMore").hidden=true; return; }
+  $("listBody").innerHTML=`<table><thead><tr><th>Quote</th><th>Route</th><th>Box</th><th class="num">As Quoted</th><th class="num">${S.basis==="allin"?"All-In":"Base Rate"} (${S.cur})</th><th>Source</th></tr></thead><tbody>`+
+    rs.slice(0,S.listN).map(r=>`<tr><td class="mono">${r.d}<div class="note">${esc(r.m)}</div></td>
+      <td class="rt"><b>${esc(routeLabel(r))}</b>
+        <details class="dt"><summary>Details</summary><p><b>Destination cell:</b> ${esc(r.dest)}<br><b>Schedule:</b> ${esc(r.sch||"—")}<br><b>Route/border:</b> ${esc(r.port||"—")}<br><b>ETD:</b> ${esc((r.etd||[]).map(e=>fmtD(e[0])).join(", "))} (${esc(ETD_LABEL[r.et]||"mixed: listed dates plus weekly schedule")})${r.note?"<br><b>Price note:</b> "+esc(r.note):""}${r.pk?"<br><b>COC pickup:</b> "+esc(r.pk):""}<br><b>Fees:</b> ${esc(r.aib)}${r.cb?"; optional "+esc(r.cb):""}<br><b>USD basis:</b> ${esc(r.ub)}<br><b>Remark:</b> ${esc(REM[r.rk]||"—")}</p></details></td>
+      <td><b>${r.bx}</b><div class="note">${esc(r.sz)}</div></td>
+      <td class="num">${r.cur==="USD"?"$":"¥"}${Math.round(r.amt).toLocaleString("en-US")}</td>
+      <td class="num">${money(value(r))}</td>
+      <td class="src">${esc(r.fam)}<br><code>${esc(r.f.split("/").pop())}</code><br>${esc(r.sh)} · row ${r.r}${r.vi?` · ${r.vi} other cop${r.vi>1?"ies":"y"} ignored`:""}</td></tr>`).join("")+"</tbody></table>";
+  $("listMore").hidden=rs.length<=S.listN;
+}
+
+/* ---------- orchestration ---------- */
+function renderSection(){
+  railFields();
+  if(S.section==="route"){ $("v-lookup").hidden=S.view!=="lookup"; $("v-timeline").hidden=S.view!=="timeline";
+    $("viewNote").textContent=S.view==="lookup"?"Every route from the selected origin, one card each.":"Pinned routes over time.";
+    if(S.view==="lookup") renderLookup(); else renderTimeline(); }
+  else if(S.section==="lane") renderLane(); else renderList();
+}
+function renderAll(){ build(); fillSelects(); renderSection(); }
+const dates=[...new Set(ROWS.map(r=>r.d))].sort();
+$("vitals").innerHTML=[["Prices",ROWS.length.toLocaleString("en-US")],["Routes",new Set(ROWS.map(r=>r.lid)).size],["Origins",ORIGINS.length],["Destinations",DESTS.length],["Latest Quote",fmtDY(dates[dates.length-1])]]
+  .map(([k,v])=>`<div class="vital"><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("");
+$("fGen").innerHTML=`<h3>Data</h3><p>${fmtDY(dates[0])} to ${fmtDY(dates[dates.length-1])}. Extracted ${esc(DATA.generated.replace("T"," "))} from ${new Set(ROWS.map(r=>r.f)).size} source files.</p>`;
+build(); fillSelects();
+const h=(location.hash||"").slice(1);
+showSection(SECS.includes(h)?h:"route");
+const rethemes=()=>{ if(S.section==="route"&&S.view==="timeline") renderTimeline(); };
+try{ matchMedia("(prefers-color-scheme: dark)").addEventListener("change",rethemes); }catch(e){}
+new MutationObserver(rethemes).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>
+
+</body></html>

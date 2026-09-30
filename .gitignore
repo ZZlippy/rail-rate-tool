@@ -1,0 +1,15 @@
+# Public repo: only the locked page (docs/index.html), scripts, template and README go up.
+# Everything below is raw or plain data and stays on this computer.
+.cache/
+__pycache__/
+*.pyc
+extract_log.txt
+rail_prices.csv
+rail_prices.json
+budapest_prices.csv
+budapest_prices.json
+dashboard_data*.json
+.staticrypt.json
+*.xls
+*.xlsx
+rail-price-tracker*.html
