@@ -3,7 +3,7 @@
 How `extract.py` reads the rail price sheets, and the decisions agreed for each source type.
 Read this before importing new files. Add every new source-specific decision here.
 
-Last updated: 2026-09-30
+Last updated: 2026-10-12
 
 ## 1. General Rules (All Types)
 
@@ -19,6 +19,8 @@ Files with the same naming convention share a format and data logic.
 | D | NEP跨里海报价表 | KLH 跨里海 |
 
 The 东南亚 sheets are excluded.
+
+Other families in the export folders are not read, because none has a Budapest price (checked 2026-10-12): the 舱位信息 capacity sheets (华南中俄, 西安, 郑州武汉太原, 石家庄天津), 沈阳绥芬河莫斯科 (Moscow) and 中亚战略路线 (布达佩斯 appears only in its station-code lookup sheet). Recheck them if a new destination is added.
 
 ### Scope (Test Pairing)
 
